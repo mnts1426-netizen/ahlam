@@ -1,6 +1,6 @@
 /**
- * منطق التطبيق الشامل - منصة رؤيا
- * إدارة اللوحات المستقلة، حجب شريط التجربة داخل اللوحات، وصلاحيات المدير الموسعة
+ * منطق التطبيق المتكامل - منصة رؤيا لتفسير الرؤى
+ * يدعم الدخول برقم الجوال والرقم السري، نظام حجب التفسير حتى الدفع/إعفاء المدير، وإدارة الشكاوى والمقترحات
  */
 
 const LOCAL_MOCK_DB = {
@@ -8,6 +8,8 @@ const LOCAL_MOCK_DB = {
     {
       id: "obs_1",
       name: "أ. عبدالعزيز (المتابع والممول)",
+      phone: "0500000004",
+      password: "123",
       email: "observer@demo.com",
       role: "Observer",
       status: "active",
@@ -18,6 +20,8 @@ const LOCAL_MOCK_DB = {
     {
       id: "adm_1",
       name: "المدير العام",
+      phone: "0500000001",
+      password: "123",
       email: "admin@demo.com",
       role: "Admin",
       status: "active",
@@ -27,6 +31,8 @@ const LOCAL_MOCK_DB = {
     {
       id: "int_1",
       name: "الشيخ أحمد المنصور",
+      phone: "0500000002",
+      password: "123",
       email: "sheikh@demo.com",
       role: "Interpreter",
       status: "active",
@@ -38,6 +44,8 @@ const LOCAL_MOCK_DB = {
     {
       id: "int_2",
       name: "الشيخ إبراهيم السعدي",
+      phone: "0500000003",
+      password: "123",
       email: "saadi@demo.com",
       role: "Interpreter",
       status: "active",
@@ -51,19 +59,21 @@ const LOCAL_MOCK_DB = {
     {
       id: "usr_1",
       name: "عمر الحربي",
+      phone: "0501234567",
+      password: "123",
       email: "user@demo.com",
       role: "User",
       status: "active",
-      phone: "0501234567",
       createdAt: "2026-08-10T10:00:00Z",
     },
     {
       id: "usr_2",
       name: "فاطمة الشهري",
+      phone: "0559876543",
+      password: "123",
       email: "fatima@demo.com",
       role: "User",
       status: "active",
-      phone: "0559876543",
       createdAt: "2026-08-12T14:30:00Z",
     },
   ],
@@ -81,8 +91,10 @@ const LOCAL_MOCK_DB = {
       maritalStatus: "أعزب",
       employmentStatus: "موظف",
       status: "مكتمل",
+      isPaid: true,
+      adminUnlocked: false,
       assignedInterpreterId: "int_1",
-      amountPaid: 11.5,
+      amount: 11.5,
       createdAt: "2026-08-15T08:30:00Z",
       updatedAt: "2026-08-16T12:00:00Z",
       interpretation: {
@@ -106,31 +118,21 @@ const LOCAL_MOCK_DB = {
       isPrivate: true,
       maritalStatus: "متزوجة",
       employmentStatus: "ربة منزل",
-      status: "قيد التفسير",
+      status: "مكتمل",
+      isPaid: false,
+      adminUnlocked: false,
       assignedInterpreterId: "int_1",
-      amountPaid: 11.5,
+      amount: 11.5,
       createdAt: "2026-08-16T19:00:00Z",
       updatedAt: "2026-08-17T09:00:00Z",
-      interpretation: null,
-    },
-    {
-      id: "ORD-1003",
-      userId: "usr_1",
-      userName: "عمر الحربي",
-      title: "صعود جبل مرتفع عند شروق الشمس",
-      dreamText:
-        "كنا نصعد جبلاً صخرياً عالياً مع أخي ووصلنا إلى القمة وقت شروق الشمس وانكشف أمامنا منظر بديع.",
-      audioUrl: null,
-      dreamDate: "2026-08-17",
-      isPrivate: false,
-      maritalStatus: "أعزب",
-      employmentStatus: "موظف",
-      status: "جديد",
-      assignedInterpreterId: null,
-      amountPaid: 11.5,
-      createdAt: "2026-08-17T22:15:00Z",
-      updatedAt: "2026-08-17T22:15:00Z",
-      interpretation: null,
+      interpretation: {
+        id: "INT-5002",
+        interpreterId: "int_1",
+        interpreterName: "الشيخ أحمد المنصور",
+        text: "بسم الله الرحمن الرحيم. إهداء المتوفى في المنام خير ورزق وبركة، والخاتم الفضي المرصع بالياقوت بشارة بحدث سار واستقرار وسعة في العيش ورفعة قدر بإذن الله.",
+        audioUrl: null,
+        createdAt: "2026-08-17T09:00:00Z",
+      },
     },
   ],
   complaints: [
@@ -139,10 +141,13 @@ const LOCAL_MOCK_DB = {
       userId: "usr_1",
       userName: "عمر الحربي",
       type: "مقترح",
-      subject: "إضافة خيار حفظ التفسير كـ PDF",
-      text: "أقترح إضافة زر لتحميل نص التفسير كملف PDF موثق.",
-      status: "تمت المراجعة",
+      subject: "إضافة خيار حفظ التفسير كملف PDF",
+      text: "أقترح إضافة زر لتحميل نص التفسير كملف موثق للرجوع إليه دائماً.",
+      status: "مغلقة",
+      adminReply:
+        "نشكرك على مقترحك القيم، تم رفع الملاحظة للفريق التقني وسيتم توفيرها قريباً.",
       createdAt: "2026-08-16T10:00:00Z",
+      closedAt: "2026-08-16T15:00:00Z",
     },
   ],
   settings: {
@@ -150,23 +155,28 @@ const LOCAL_MOCK_DB = {
     pricePerOrder: 11.5,
     tagline: "تفسير الرؤى والأحلام بضوابط شرعية",
     audioMaxDurationSec: 180,
-    contactEmail: "support@ruya.app",
   },
 };
 
 const App = {
   state: {
     currentUser: null,
-    currentRole: "Guest", // Guest | User | Interpreter | Admin | Observer
+    currentRole: "Guest",
     token: null,
     currentView: "landing",
     orders: [],
     interpreters: [],
     settings: {},
     intActiveTab: "new",
-    admActiveTab: "dashboard", // dashboard | orders | users | interpreters | finance | reports | complaints | settings
+    admActiveTab: "dashboard",
     obsActiveTab: "stats",
     adminSearchQuery: "",
+    publicAudioBase64: null,
+    publicMediaRecorder: null,
+    publicAudioChunks: [],
+    publicTimerInterval: null,
+    publicSeconds: 0,
+    isPublicRecording: false,
     audioRecorder: {
       mediaRecorder: null,
       audioChunks: [],
@@ -190,7 +200,10 @@ const App = {
     this.restoreSession();
     await this.fetchSettings();
     await this.fetchInterpretersPublic();
-    this.updateAuthNav();
+
+    // ضبط تاريخ اليوم تلقائياً
+    const dateInput = document.getElementById("pubOrderDate");
+    if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
 
     if (this.state.currentUser) {
       this.routeByRole(this.state.currentRole);
@@ -221,7 +234,6 @@ const App = {
     localStorage.setItem("ruya_user", JSON.stringify(user));
     localStorage.setItem("ruya_role", role);
     localStorage.setItem("ruya_token", token);
-    this.updateAuthNav();
     this.renderSidebar();
   },
 
@@ -232,7 +244,6 @@ const App = {
     localStorage.removeItem("ruya_user");
     localStorage.removeItem("ruya_role");
     localStorage.removeItem("ruya_token");
-    this.updateAuthNav();
     this.navigate("landing");
     this.showToast("تم تسجيل الخروج بنجاح", "info");
   },
@@ -256,40 +267,43 @@ const App = {
   },
 
   localFallbackHandler(endpoint, method, body) {
-    const cleanEmail =
-      body && body.email ? body.email.trim().toLowerCase() : "";
-
     if (endpoint === "/auth/login") {
+      const { phone, password } = body;
+      const cleanPhone = (phone || "").trim();
+
+      // البحث برقم الجوال
       const obs = LOCAL_MOCK_DB.observers.find(
-        (o) => o.email.toLowerCase() === cleanEmail,
+        (o) => o.phone === cleanPhone || o.email === cleanPhone,
       );
       if (obs) return { user: obs, role: "Observer", token: "token-obs" };
 
       const admin = LOCAL_MOCK_DB.admins.find(
-        (a) => a.email.toLowerCase() === cleanEmail,
+        (a) => a.phone === cleanPhone || a.email === cleanPhone,
       );
       if (admin) return { user: admin, role: "Admin", token: "token-admin" };
 
       const interp = LOCAL_MOCK_DB.interpreters.find(
-        (i) => i.email.toLowerCase() === cleanEmail,
+        (i) => i.phone === cleanPhone || i.email === cleanPhone,
       );
       if (interp)
         return { user: interp, role: "Interpreter", token: "token-int" };
 
       let user = LOCAL_MOCK_DB.users.find(
-        (u) => u.email.toLowerCase() === cleanEmail,
+        (u) => u.phone === cleanPhone || u.email === cleanPhone,
       );
-      if (!user) {
-        user = {
-          id: `usr_${Date.now()}`,
-          name: cleanEmail ? cleanEmail.split("@")[0] : "مستخدم جديد",
-          email: cleanEmail || "user@demo.com",
-          role: "User",
-          status: "active",
-          createdAt: new Date().toISOString(),
-        };
-        LOCAL_MOCK_DB.users.push(user);
-      }
+      if (user) return { user, role: "User", token: "token-user" };
+
+      // تسجيل فوري إذا لم يكن موجوداً
+      user = {
+        id: `usr_${Date.now()}`,
+        name: `مستخدم ${cleanPhone.slice(-4)}`,
+        phone: cleanPhone,
+        password: password || "123",
+        role: "User",
+        status: "active",
+        createdAt: new Date().toISOString(),
+      };
+      LOCAL_MOCK_DB.users.push(user);
       return { user, role: "User", token: "token-user" };
     }
 
@@ -310,58 +324,9 @@ const App = {
       return res;
     }
 
-    if (endpoint === "/orders" && method === "POST") {
-      const newOrder = {
-        id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-        userId: this.state.currentUser ? this.state.currentUser.id : "usr_1",
-        userName: this.state.currentUser
-          ? this.state.currentUser.name
-          : "صاحب الرؤيا",
-        title: body.title,
-        dreamText: body.dreamText || "",
-        audioUrl: body.audioUrl || null,
-        dreamDate: body.dreamDate || new Date().toISOString().split("T")[0],
-        maritalStatus: body.maritalStatus || "غير محدد",
-        employmentStatus: body.employmentStatus || "غير محدد",
-        status: "جديد",
-        assignedInterpreterId: null,
-        amountPaid: 11.5,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        interpretation: null,
-      };
-      LOCAL_MOCK_DB.orders.unshift(newOrder);
-      return newOrder;
-    }
-
-    if (endpoint.startsWith("/orders/") && endpoint.endsWith("/interpret")) {
-      const orderId = endpoint.split("/")[2];
-      const order = LOCAL_MOCK_DB.orders.find((o) => o.id === orderId);
-      if (order) {
-        order.status = "مكتمل";
-        order.interpretation = {
-          id: `INT-${Date.now()}`,
-          interpreterName: this.state.currentUser
-            ? this.state.currentUser.name
-            : "الشيخ أحمد المنصور",
-          text: body.text,
-          audioUrl: body.audioUrl,
-          createdAt: new Date().toISOString(),
-        };
-      }
-      return { success: true };
-    }
-
-    if (endpoint.startsWith("/orders/") && endpoint.endsWith("/status")) {
-      const orderId = endpoint.split("/")[2];
-      const order = LOCAL_MOCK_DB.orders.find((o) => o.id === orderId);
-      if (order && body.status) order.status = body.status;
-      return { success: true };
-    }
-
     if (endpoint === "/admin/stats") {
       const totalRev =
-        LOCAL_MOCK_DB.orders.filter((o) => o.status === "مكتمل").length * 11.5;
+        LOCAL_MOCK_DB.orders.filter((o) => o.isPaid).length * 11.5;
       return {
         totalUsers: LOCAL_MOCK_DB.users.length,
         totalInterpreters: LOCAL_MOCK_DB.interpreters.length,
@@ -369,10 +334,10 @@ const App = {
         newOrders: LOCAL_MOCK_DB.orders.filter((o) => o.status === "جديد")
           .length,
         completedOrders: LOCAL_MOCK_DB.orders.filter(
-          (o) => o.status === "مكتمل" || o.status === "تم التفسير",
+          (o) => o.status === "مكتمل",
         ).length,
         inProgressOrders: LOCAL_MOCK_DB.orders.filter(
-          (o) => o.status === "قيد التفسير" || o.status === "قيد المراجعة",
+          (o) => o.status === "قيد التفسير",
         ).length,
         totalRevenue: totalRev,
         pendingRevenue: LOCAL_MOCK_DB.orders.length * 11.5 - totalRev,
@@ -391,16 +356,18 @@ const App = {
     this.state.currentView = viewName;
     const isLanding = viewName === "landing";
 
-    // إخفاء/إظهار شريط التجربة والهيدر العام
+    // إخفاء الشريط التجريبي والهيدر العام في اللوحات
     const demoBar = document.getElementById("demoTopBar");
     const pubHeader = document.getElementById("publicHeader");
     const pubFooter = document.getElementById("publicFooter");
+    const mobileHeader = document.getElementById("mobileDashboardHeader");
     const landingEl = document.getElementById("viewLanding");
     const dashWrapper = document.getElementById("dashboardWrapper");
 
     if (demoBar) demoBar.style.display = isLanding ? "block" : "none";
     if (pubHeader) pubHeader.style.display = isLanding ? "block" : "none";
     if (pubFooter) pubFooter.style.display = isLanding ? "block" : "none";
+    if (mobileHeader) mobileHeader.style.display = isLanding ? "none" : "flex";
 
     document
       .querySelectorAll(".view-section")
@@ -450,17 +417,21 @@ const App = {
     else this.navigate("userDashboard");
   },
 
-  // بناء القائمة الجانبية المستقلة بدون أي روابط للواجهة العامة
+  toggleMobileDrawer() {
+    const sidebar = document.getElementById("sidebarContainer");
+    if (sidebar) {
+      sidebar.classList.toggle("hidden");
+    }
+  },
+
+  // بناء القائمة الجانبية في اليمين بدون رابط للواجهة العامة
   renderSidebar() {
     const card = document.getElementById("sidebarUserCard");
     const nav = document.getElementById("sidebarNavLinks");
     const roleBadge = document.getElementById("sidebarRoleBadge");
     if (!card || !nav) return;
 
-    if (!this.state.currentUser) {
-      this.navigate("landing");
-      return;
-    }
+    if (!this.state.currentUser) return;
 
     const roleLabels = {
       Admin: "المدير العام",
@@ -479,12 +450,12 @@ const App = {
         </div>
         <div class="min-w-0 flex-grow">
           <div class="text-xs font-bold text-brand-primary truncate">${this.state.currentUser.name}</div>
-          <span class="text-[10px] text-brand-muted block truncate">${this.state.currentUser.email}</span>
+          <span class="text-[10px] text-brand-muted block truncate">${this.state.currentUser.phone || this.state.currentUser.email}</span>
         </div>
       </div>
     `;
 
-    // 1. قائمة المستخدم
+    // قائمة المستخدم
     if (this.state.currentRole === "User") {
       nav.innerHTML = `
         <button type="button" onclick="App.navigate('userDashboard')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium ${this.state.currentView === "userDashboard" ? "bg-brand-primary text-white font-bold" : "text-brand-text hover:bg-brand-bg"}"><i class="fa-solid fa-list-check text-xs"></i> طلباتي وحالاتها</button>
@@ -492,7 +463,7 @@ const App = {
         <button type="button" onclick="App.openAddComplaintModal()" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium text-brand-text hover:bg-brand-bg"><i class="fa-regular fa-comment-dots text-xs"></i> الشكاوى والمقترحات</button>
       `;
     }
-    // 2. قائمة المفسر
+    // قائمة المفسر
     else if (this.state.currentRole === "Interpreter") {
       nav.innerHTML = `
         <button type="button" onclick="App.navigate('interpreterDashboard'); App.setIntTab('new')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium ${this.state.intActiveTab === "new" ? "bg-brand-primary text-white font-bold" : "text-brand-text hover:bg-brand-bg"}"><i class="fa-solid fa-inbox text-xs"></i> الطلبات الجديدة</button>
@@ -500,7 +471,7 @@ const App = {
         <button type="button" onclick="App.navigate('interpreterDashboard'); App.setIntTab('completed')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium ${this.state.intActiveTab === "completed" ? "bg-brand-primary text-white font-bold" : "text-brand-text hover:bg-brand-bg"}"><i class="fa-solid fa-check-double text-xs"></i> السجل المكتمل</button>
       `;
     }
-    // 3. قائمة المدير العام الموسعة والشاملة
+    // قائمة المدير العام الشاملة
     else if (this.state.currentRole === "Admin") {
       const active = this.state.admActiveTab;
       nav.innerHTML = `
@@ -514,7 +485,7 @@ const App = {
         <button type="button" onclick="App.setAdminTab('settings')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium ${active === "settings" ? "bg-brand-primary text-white font-bold" : "text-brand-text hover:bg-brand-bg"}"><i class="fa-solid fa-sliders text-xs"></i> إعدادات النظام</button>
       `;
     }
-    // 4. قائمة المتابع والممول
+    // قائمة المتابع والممول
     else if (this.state.currentRole === "Observer") {
       nav.innerHTML = `
         <button type="button" onclick="App.setObsTab('stats')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium ${this.state.obsActiveTab === "stats" ? "bg-brand-primary text-white font-bold" : "text-brand-text hover:bg-brand-bg"}"><i class="fa-solid fa-chart-pie text-xs"></i> نظرة عامة ومؤشرات</button>
@@ -525,51 +496,173 @@ const App = {
     }
   },
 
-  updateAuthNav() {
-    const container = document.getElementById("authNavControls");
-    if (!container) return;
+  // ===================== التسجيل والإرسال المباشر من الواجهة =====================
+  async togglePublicRecording() {
+    const btn = document.getElementById("pubRecordBtn");
+    const icon = document.getElementById("pubRecordIcon");
+    const timer = document.getElementById("pubRecordingTimer");
+    const statusText = document.getElementById("pubRecordStatusText");
 
-    if (!this.state.currentUser) {
-      container.innerHTML = `
-        <button type="button" onclick="App.openLoginModal()" class="px-4 py-2 rounded-xl text-brand-muted hover:text-brand-primary font-medium text-xs transition">
-          دخول
-        </button>
-        <button type="button" onclick="App.handleSendDreamClick()" class="px-5 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primaryHover text-white font-medium text-xs shadow-sm transition">
-          أرسل رؤيتك
-        </button>
-      `;
+    if (!this.state.isPublicRecording) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        this.state.publicMediaRecorder = new MediaRecorder(stream);
+        this.state.publicAudioChunks = [];
+
+        this.state.publicMediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) this.state.publicAudioChunks.push(e.data);
+        };
+
+        this.state.publicMediaRecorder.onstop = () => {
+          const blob = new Blob(this.state.publicAudioChunks, {
+            type: "audio/webm",
+          });
+          const preview = document.getElementById("pubAudioPreview");
+          if (preview) preview.src = URL.createObjectURL(blob);
+          document
+            .getElementById("pubAudioPreviewContainer")
+            ?.classList.remove("hidden");
+
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = () => {
+            this.state.publicAudioBase64 = reader.result;
+          };
+        };
+
+        this.state.publicMediaRecorder.start();
+        this.state.isPublicRecording = true;
+        this.state.publicSeconds = 0;
+        if (timer) timer.classList.remove("hidden");
+        if (btn) btn.classList.add("recording-pulse");
+        if (icon) icon.className = "fa-solid fa-stop text-white";
+        if (statusText)
+          statusText.innerText = "جاري تسجيل رؤيتك... اضغط للإيقاف";
+
+        this.state.publicTimerInterval = setInterval(() => {
+          this.state.publicSeconds++;
+          const mins = String(
+            Math.floor(this.state.publicSeconds / 60),
+          ).padStart(2, "0");
+          const secs = String(this.state.publicSeconds % 60).padStart(2, "0");
+          if (timer) timer.innerText = `${mins}:${secs}`;
+          if (this.state.publicSeconds >= 180) App.togglePublicRecording();
+        }, 1000);
+      } catch (err) {
+        this.showToast("يرجى السماح بالوصول للميكروفون", "error");
+      }
     } else {
-      container.innerHTML = `
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="App.routeByRole('${this.state.currentRole}')" class="flex items-center gap-2 text-right bg-brand-bg hover:bg-brand-border/60 px-3 py-1.5 rounded-xl border border-brand-border transition">
-            <div class="w-6 h-6 rounded-md bg-brand-primary text-white flex items-center justify-center font-bold text-xs">
-              ${this.state.currentUser.name ? this.state.currentUser.name.charAt(0) : "U"}
-            </div>
-            <span class="text-xs font-medium text-brand-primary hidden sm:inline">${this.state.currentUser.name}</span>
-          </button>
-          <button type="button" onclick="App.clearSession()" class="text-brand-muted hover:text-red-600 p-2 text-xs" title="تسجيل خروج">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          </button>
-        </div>
-      `;
+      if (
+        this.state.publicMediaRecorder &&
+        this.state.publicMediaRecorder.state !== "inactive"
+      ) {
+        this.state.publicMediaRecorder.stop();
+        this.state.publicMediaRecorder.stream
+          .getTracks()
+          .forEach((t) => t.stop());
+      }
+      clearInterval(this.state.publicTimerInterval);
+      this.state.isPublicRecording = false;
+      if (btn) btn.classList.remove("recording-pulse");
+      if (icon) icon.className = "fa-solid fa-microphone text-brand-accent";
+      if (statusText) statusText.innerText = "تم حفظ التسجيل الصوتي بنجاح";
     }
   },
 
-  handleSendDreamClick() {
-    if (!this.state.currentUser) {
-      this.openLoginModal();
-    } else {
-      this.navigate("newOrder");
-    }
+  removePublicRecording() {
+    this.state.publicAudioBase64 = null;
+    document
+      .getElementById("pubAudioPreviewContainer")
+      ?.classList.add("hidden");
+    document.getElementById("pubRecordingTimer")?.classList.add("hidden");
+    const statusText = document.getElementById("pubRecordStatusText");
+    if (statusText) statusText.innerText = "اضغط على الميكروفون لبدء التسجيل";
   },
 
+  async handlePublicDreamSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const title = document.getElementById("pubOrderTitle").value;
+    const dreamText = document.getElementById("pubOrderDreamText").value;
+    const dreamDate = document.getElementById("pubOrderDate").value;
+    const maritalStatus = document.getElementById("pubOrderMarital").value;
+    const employmentStatus =
+      document.getElementById("pubOrderEmployment").value;
+    const name = document.getElementById("regUserName").value;
+    const phone = document.getElementById("regUserPhone").value;
+    const password = document.getElementById("regUserPass").value;
+    const email = document.getElementById("regUserEmail").value;
+    const audioUrl = this.state.publicAudioBase64;
+    const btn = document.getElementById("btnSubmitPubDream");
+
+    if (!dreamText && !audioUrl) {
+      return this.showToast("يرجى كتابة نص الرؤيا أو تسجيلها صوتياً", "error");
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-xs"></i> جاري إرسال الرؤيا وتجهيز الحساب...`;
+    }
+
+    // 1. تسجيل / مطابقة المستخدم
+    let user = LOCAL_MOCK_DB.users.find((u) => u.phone === phone);
+    if (!user) {
+      user = {
+        id: `usr_${Date.now()}`,
+        name,
+        phone,
+        password,
+        email: email || `${phone}@ruya.app`,
+        role: "User",
+        status: "active",
+        createdAt: new Date().toISOString(),
+      };
+      LOCAL_MOCK_DB.users.push(user);
+    }
+
+    // 2. إنشاء الطلب
+    const newOrder = {
+      id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+      userId: user.id,
+      userName: user.name,
+      title,
+      dreamText: dreamText || "",
+      audioUrl: audioUrl || null,
+      dreamDate: dreamDate || new Date().toISOString().split("T")[0],
+      maritalStatus,
+      employmentStatus,
+      status: "جديد",
+      isPaid: false,
+      adminUnlocked: false,
+      assignedInterpreterId: null,
+      amount: 11.5,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      interpretation: null,
+    };
+    LOCAL_MOCK_DB.orders.unshift(newOrder);
+
+    // 3. الدخول التلقائي لحساب المستخدم وعرض لوحة طلباته
+    this.setSession(user, "User", "token-user");
+    this.showToast("تم إرسال رؤيتك بنجاح للمفسر وتم إنشاء حسابك", "success");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<span>إرسال الرؤيا للمفسر</span> <i class="fa-solid fa-arrow-left text-xs"></i>`;
+    }
+    this.navigate("userDashboard");
+  },
+
+  // ===================== تسجيل الدخول العادي =====================
   async handleLogin(e) {
     if (e && e.preventDefault) e.preventDefault();
-    const input = document.getElementById("loginEmail");
-    const email = input ? input.value : "";
-    if (!email) return;
+    const phone = document.getElementById("loginPhone").value;
+    const password = document.getElementById("loginPass").value;
 
-    const res = await this.apiRequest("/auth/login", "POST", { email });
+    const res = await this.apiRequest("/auth/login", "POST", {
+      phone,
+      password,
+    });
     if (res && res.user) {
       this.setSession(res.user, res.role, res.token);
       this.closeLoginModal();
@@ -578,14 +671,11 @@ const App = {
     }
   },
 
-  loginWithDemo(email) {
-    const input = document.getElementById("loginEmail");
-    if (input) input.value = email;
-    this.handleLogin(new Event("submit"));
-  },
-
-  async quickSwitchRole(role, email) {
-    const res = await this.apiRequest("/auth/login", "POST", { email });
+  async quickSwitchRole(role, phone) {
+    const res = await this.apiRequest("/auth/login", "POST", {
+      phone,
+      password: "123",
+    });
     if (res && res.user) {
       this.setSession(res.user, res.role, res.token);
       this.showToast(`تم الدخول بحساب: ${res.user.name}`, "info");
@@ -600,7 +690,7 @@ const App = {
     document.getElementById("loginModal")?.classList.add("hidden");
   },
 
-  // ===================== استوديو الصوت =====================
+  // ===================== إرسال رؤيا جديدة من داخل الحساب =====================
   async toggleRecording() {
     const rec = this.state.audioRecorder;
     const btn = document.getElementById("recordBtn");
@@ -652,10 +742,7 @@ const App = {
           if (rec.seconds >= 180) App.toggleRecording();
         }, 1000);
       } catch (err) {
-        this.showToast(
-          "تعذر الوصول إلى الميكروفون. يرجى تفعيل الصلاحية.",
-          "error",
-        );
+        this.showToast("تعذر الوصول إلى الميكروفون", "error");
       }
     } else {
       if (rec.mediaRecorder && rec.mediaRecorder.state !== "inactive") {
@@ -694,32 +781,32 @@ const App = {
     const maritalStatus = document.getElementById("orderMarital").value;
     const employmentStatus = document.getElementById("orderEmployment").value;
     const audioUrl = this.state.audioRecorder.audioBase64;
-    const btn = document.getElementById("btnSubmitOrder");
 
     if (!dreamText && !audioUrl)
       return this.showToast("يرجى كتابة نص الرؤيا أو تسجيلها صوتياً", "error");
 
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-xs"></i> جاري إرسال رؤيتك...`;
-    }
-
-    await this.apiRequest("/orders", "POST", {
-      title,
-      dreamText,
-      audioUrl,
-      dreamDate,
-      maritalStatus,
-      employmentStatus,
+    const newOrder = {
+      id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
       userId: this.state.currentUser.id,
       userName: this.state.currentUser.name,
-    });
+      title,
+      dreamText: dreamText || "",
+      audioUrl: audioUrl || null,
+      dreamDate: dreamDate || new Date().toISOString().split("T")[0],
+      maritalStatus,
+      employmentStatus,
+      status: "جديد",
+      isPaid: false,
+      adminUnlocked: false,
+      assignedInterpreterId: null,
+      amount: 11.5,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      interpretation: null,
+    };
+    LOCAL_MOCK_DB.orders.unshift(newOrder);
 
     this.showToast("تم إرسال رؤيتك بنجاح للمفسر", "success");
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `<span>إرسال الرؤيا</span>`;
-    }
     this.navigate("userDashboard");
   },
 
@@ -742,7 +829,7 @@ const App = {
           <div class="w-12 h-12 bg-brand-bg rounded-xl flex items-center justify-center text-brand-muted text-xl mx-auto">
             <i class="fa-solid fa-feather"></i>
           </div>
-          <h5 class="text-sm font-bold text-brand-primary">لا توجد رؤى حتى الآن</h5>
+          <h5 class="text-sm font-bold text-brand-primary">لا توجد رؤى سابقة حتى الآن</h5>
           <p class="text-xs text-brand-muted max-w-xs mx-auto">أرسل رؤيتك الأولى وابدأ تجربتك مع مفسر موثوق.</p>
           <button type="button" onclick="App.navigate('newOrder')" class="px-5 py-2 bg-brand-primary text-white text-xs font-medium rounded-xl shadow-sm">إرسال رؤيا</button>
         </div>
@@ -769,7 +856,7 @@ const App = {
         <div class="flex items-center justify-between sm:justify-end gap-2.5">
           ${this.getStatusBadge(order.status)}
           <button type="button" class="px-3 py-1 bg-white hover:bg-brand-bg border border-brand-border text-brand-text rounded-lg text-xs font-medium transition">
-            التفاصيل
+            عرض الحالة والتفسير
           </button>
         </div>
       </div>
@@ -886,10 +973,11 @@ const App = {
   },
 
   async startInterpreting(orderId) {
-    await this.apiRequest(`/orders/${orderId}/status`, "PATCH", {
-      status: "قيد التفسير",
-      assignedInterpreterId: this.state.currentUser.id,
-    });
+    const order = LOCAL_MOCK_DB.orders.find((o) => o.id === orderId);
+    if (order) {
+      order.status = "قيد التفسير";
+      order.assignedInterpreterId = this.state.currentUser.id;
+    }
     this.showToast("تم فتح الطلب للبدء في التفسير", "success");
     await this.loadInterpreterDashboard();
     this.openInterpretStudioModal(orderId);
@@ -897,7 +985,7 @@ const App = {
 
   // ===================== استوديو المفسر =====================
   openInterpretStudioModal(orderId) {
-    const order = this.state.orders.find((o) => o.id === orderId);
+    const order = LOCAL_MOCK_DB.orders.find((o) => o.id === orderId);
     if (!order) return;
 
     const modal = document.getElementById("interpretActionModal");
@@ -931,7 +1019,7 @@ const App = {
       <form onsubmit="App.handleSubmitInterpretation(event, '${order.id}')" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-brand-primary mb-1">كتابة التفسير *</label>
-          <textarea id="interpText" rows="4" required placeholder="اكتب التفسير الوافي هنا..." class="w-full p-3 border border-brand-border rounded-xl text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition">${order.interpretation ? order.interpretation.text : ""}</textarea>
+          <textarea id="interpText" rows="4" required placeholder="اكتب التفسير الوافي هنا..." class="w-full p-3 border border-brand-border rounded-xl text-xs focus:border-brand-primary outline-none transition">${order.interpretation ? order.interpretation.text : ""}</textarea>
         </div>
 
         <div class="bg-brand-bg border border-brand-border p-3.5 rounded-xl text-center space-y-2">
@@ -950,7 +1038,7 @@ const App = {
 
         <div class="pt-2 flex justify-end gap-2">
           <button type="button" onclick="App.closeInterpretStudioModal()" class="px-4 py-2 border border-brand-border text-brand-text rounded-xl text-xs font-medium">إلغاء</button>
-          <button type="submit" class="px-6 py-2 bg-brand-primary hover:bg-brand-primaryHover text-white font-medium rounded-xl text-xs shadow-sm">إرسال التفسير للعميل</button>
+          <button type="submit" class="px-6 py-2 bg-brand-primary hover:bg-brand-primaryHover text-white font-medium rounded-xl text-xs shadow-sm">اعتماد وإرسال التفسير</button>
         </div>
       </form>
     `;
@@ -1004,6 +1092,7 @@ const App = {
           const mins = String(Math.floor(rec.seconds / 60)).padStart(2, "0");
           const secs = String(rec.seconds % 60).padStart(2, "0");
           if (timer) timer.innerText = `${mins}:${secs}`;
+          if (rec.seconds >= 180) App.toggleInterpRecording();
         }, 1000);
       } catch (e) {
         this.showToast("تعذر فتح الميكروفون", "error");
@@ -1026,18 +1115,24 @@ const App = {
     const text = document.getElementById("interpText").value;
     const audioUrl = this.state.interpAudioRecorder.audioBase64;
 
-    await this.apiRequest(`/orders/${orderId}/interpret`, "POST", {
-      text,
-      audioUrl,
-      interpreterId: this.state.currentUser.id,
-      interpreterName: this.state.currentUser.name,
-    });
-    this.showToast("تم اعتماد وإرسال التفسير للعميل بنجاح", "success");
+    const order = LOCAL_MOCK_DB.orders.find((o) => o.id === orderId);
+    if (order) {
+      order.status = "مكتمل";
+      order.interpretation = {
+        id: `INT-${Date.now()}`,
+        interpreterId: this.state.currentUser.id,
+        interpreterName: this.state.currentUser.name,
+        text,
+        audioUrl,
+        createdAt: new Date().toISOString(),
+      };
+    }
+    this.showToast("تم اعتماد وإرسال التفسير بنجاح", "success");
     this.closeInterpretStudioModal();
     await this.loadInterpreterDashboard();
   },
 
-  // ===================== لوحة تحكم المدير العام الموسعة =====================
+  // ===================== لوحة المدير العام الموسعة =====================
   async loadAdminDashboard() {
     this.renderAdminTabContent();
   },
@@ -1063,13 +1158,12 @@ const App = {
 
     const tab = this.state.admActiveTab;
     const stats = await this.apiRequest("/admin/stats");
-    const orders = (await this.apiRequest("/orders")) || [];
-    const users = (await this.apiRequest("/users")) || [];
-    const interpreters = (await this.apiRequest("/interpreters")) || [];
+    const orders = LOCAL_MOCK_DB.orders;
+    const users = LOCAL_MOCK_DB.users;
+    const interpreters = LOCAL_MOCK_DB.interpreters;
     const complaints = LOCAL_MOCK_DB.complaints;
     const query = this.state.adminSearchQuery;
 
-    // إخفاء/إظهار بطاقات KPI بحسب التبويب
     if (kpi) {
       if (tab === "dashboard" || tab === "reports" || tab === "finance") {
         kpi.classList.remove("hidden");
@@ -1088,7 +1182,7 @@ const App = {
 
     if (actions) actions.innerHTML = "";
 
-    // 1. تبويب لوحة التحكم (Overview)
+    // 1. نظرة عامة
     if (tab === "dashboard") {
       if (title) title.innerText = "لوحة التحكم الرئيسية";
       if (subtitle)
@@ -1101,7 +1195,7 @@ const App = {
             <button type="button" onclick="App.setAdminTab('orders')" class="text-[11px] text-brand-primary font-bold hover:underline">عرض كافة الطلبات ←</button>
           </div>
           <div class="overflow-x-auto"><table class="w-full text-right text-xs">
-            <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">رقم الطلب</th><th class="p-2.5">المستخدم</th><th class="p-2.5">عنوان الرؤيا</th><th class="p-2.5">الحالة</th><th class="p-2.5">إجراء</th></tr></thead>
+            <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">رقم الطلب</th><th class="p-2.5">المستخدم</th><th class="p-2.5">عنوان الرؤيا</th><th class="p-2.5">الحالة</th><th class="p-2.5">الدفع/الإعفاء</th><th class="p-2.5">إجراء</th></tr></thead>
             <tbody class="divide-y divide-brand-border">
               ${orders
                 .slice(0, 5)
@@ -1112,6 +1206,7 @@ const App = {
                   <td class="p-2.5 font-medium text-brand-primary">${o.userName}</td>
                   <td class="p-2.5">${o.title}</td>
                   <td class="p-2.5">${this.getStatusBadge(o.status)}</td>
+                  <td class="p-2.5">${o.isPaid ? '<span class="text-emerald-700 font-bold">مسدد</span>' : o.adminUnlocked ? '<span class="text-brand-primary font-bold">معفى من المدير</span>' : '<span class="text-amber-700 font-bold">بانتظار السداد</span>'}</td>
                   <td class="p-2.5"><button type="button" onclick="App.showOrderDetails('${o.id}')" class="px-2.5 py-1 bg-white border border-brand-border rounded-lg text-brand-text font-medium text-[11px]">عرض</button></td>
                 </tr>
               `,
@@ -1122,11 +1217,12 @@ const App = {
         </div>
       `;
     }
-    // 2. تبويب إدارة الطلبات
+    // 2. إدارة الطلبات والتدخل الإداري
     else if (tab === "orders") {
       if (title) title.innerText = "إدارة الطلبات والرؤى";
       if (subtitle)
-        subtitle.innerText = "متابعة وإدارة كل الطلبات والتدخل الإداري";
+        subtitle.innerText =
+          "متابعة وإدارة كل الطلبات والتدخل الإداري وإعفاء الرسوم";
 
       let filteredOrders = orders;
       if (query)
@@ -1143,7 +1239,7 @@ const App = {
             <input type="text" id="adminSearchInput" oninput="App.handleAdminSearch(this.value)" value="${this.state.adminSearchQuery}" placeholder="بحث برقم الطلب أو اسم الرائي..." class="px-3.5 py-2 rounded-xl border border-brand-border text-xs outline-none focus:border-brand-primary w-full max-w-sm" />
           </div>
           <div class="overflow-x-auto"><table class="w-full text-right text-xs">
-            <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">رقم الطلب</th><th class="p-2.5">المستخدم</th><th class="p-2.5">عنوان الرؤيا</th><th class="p-2.5">الحالة</th><th class="p-2.5">التاريخ</th><th class="p-2.5">التحكم</th></tr></thead>
+            <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">رقم الطلب</th><th class="p-2.5">المستخدم</th><th class="p-2.5">عنوان الرؤيا</th><th class="p-2.5">الحالة</th><th class="p-2.5">الرسوم</th><th class="p-2.5">التحكم والإعفاء</th></tr></thead>
             <tbody class="divide-y divide-brand-border">
               ${filteredOrders
                 .map(
@@ -1153,10 +1249,10 @@ const App = {
                   <td class="p-2.5 font-medium text-brand-primary">${o.userName}</td>
                   <td class="p-2.5">${o.title}</td>
                   <td class="p-2.5">${this.getStatusBadge(o.status)}</td>
-                  <td class="p-2.5 text-brand-muted">${new Date(o.createdAt).toLocaleDateString("ar-SA")}</td>
+                  <td class="p-2.5">${o.isPaid ? '<span class="text-emerald-700 font-bold">مسدد</span>' : o.adminUnlocked ? '<span class="text-brand-primary font-bold">معفى مجاناً</span>' : '<span class="text-amber-700 font-bold">معلق (11.5 ريال)</span>'}</td>
                   <td class="p-2.5 flex items-center gap-1.5">
                     <button type="button" onclick="App.showOrderDetails('${o.id}')" class="px-2.5 py-1 bg-white border border-brand-border rounded-lg text-brand-text font-medium text-[11px]">تفاصيل</button>
-                    ${o.status === "جديد" ? `<button type="button" onclick="App.adminForceAssign('${o.id}')" class="px-2 py-1 bg-brand-primary text-white rounded-lg text-[10px] font-medium">تعيين لمفسر</button>` : ""}
+                    ${!o.isPaid && !o.adminUnlocked ? `<button type="button" onclick="App.adminToggleUnlock('${o.id}')" class="px-2 py-1 bg-brand-primary text-white rounded-lg text-[10px] font-medium" title="السماح للرائي بالاطلاع مجاناً بدون دفع">إعفاء مجاني</button>` : ""}
                   </td>
                 </tr>
               `,
@@ -1167,7 +1263,7 @@ const App = {
         </div>
       `;
     }
-    // 3. تبويب إدارة المستخدمين
+    // 3. إدارة المستخدمين
     else if (tab === "users") {
       if (title) title.innerText = "إدارة المستخدمين";
       if (subtitle)
@@ -1182,18 +1278,18 @@ const App = {
 
       container.innerHTML = `
         <div class="overflow-x-auto"><table class="w-full text-right text-xs">
-          <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">الاسم</th><th class="p-2.5">البريد</th><th class="p-2.5">تاريخ الانضمام</th><th class="p-2.5">الحالة</th><th class="p-2.5">التحكم</th></tr></thead>
+          <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">الاسم</th><th class="p-2.5">رقم الجوال</th><th class="p-2.5">البريد</th><th class="p-2.5">الحالة</th><th class="p-2.5">التحكم</th></tr></thead>
           <tbody class="divide-y divide-brand-border">
             ${users
               .map(
                 (u) => `
               <tr class="hover:bg-brand-bg/40">
                 <td class="p-2.5 font-bold text-brand-primary">${u.name}</td>
-                <td class="p-2.5 font-mono text-brand-muted">${u.email}</td>
-                <td class="p-2.5 text-brand-muted">${new Date(u.createdAt).toLocaleDateString("ar-SA")}</td>
+                <td class="p-2.5 font-mono text-brand-text">${u.phone || "غير مسجل"}</td>
+                <td class="p-2.5 font-mono text-brand-muted">${u.email || "-"}</td>
                 <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${u.status === "active" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-red-50 text-red-800 border border-red-200"}">${u.status === "active" ? "نشط" : "معطل"}</span></td>
                 <td class="p-2.5 flex items-center gap-1.5">
-                  <button type="button" onclick="App.toggleUserStatus('${u.id}')" class="px-2.5 py-1 text-[11px] font-medium rounded-lg border ${u.status === "active" ? "border-red-600 text-red-600 hover:bg-red-50" : "border-brand-primary text-brand-primary hover:bg-brand-bg"}">${u.status === "active" ? "تعطيل" : "تفعيل"}</button>
+                  <button type="button" onclick="App.toggleUserStatus('${u.id}')" class="px-2 py-1 text-[11px] font-medium rounded-lg border ${u.status === "active" ? "border-red-600 text-red-600 hover:bg-red-50" : "border-brand-primary text-brand-primary hover:bg-brand-bg"}">${u.status === "active" ? "تعطيل" : "تفعيل"}</button>
                 </td>
               </tr>
             `,
@@ -1203,11 +1299,11 @@ const App = {
         </table></div>
       `;
     }
-    // 4. تبويب إدارة المفسرين
+    // 4. إدارة المفسرين
     else if (tab === "interpreters") {
       if (title) title.innerText = "إدارة المفسرين المعتمدين";
       if (subtitle)
-        subtitle.innerText = "سجل المفسرين وإضافة مشايخ ومفسرين جدد";
+        subtitle.innerText = "سجل المشايخ والمفسرين وإضافة مفسر جديد";
       if (actions)
         actions.innerHTML = `
         <button type="button" onclick="App.openAddInterpreterModal()" class="px-3.5 py-2 bg-brand-primary hover:bg-brand-primaryHover text-white rounded-xl text-xs font-medium transition flex items-center gap-1.5">
@@ -1224,9 +1320,9 @@ const App = {
             <div class="p-4 border border-brand-border rounded-xl bg-white shadow-subtle flex justify-between items-start">
               <div>
                 <h5 class="font-bold text-xs text-brand-primary font-display">${i.name}</h5>
+                <p class="text-[11px] text-brand-text font-mono mt-0.5">${i.phone || ""}</p>
                 <p class="text-[11px] text-brand-muted mt-0.5">${i.specializedIn}</p>
                 <div class="text-[11px] text-brand-text mt-2 font-medium">إجمالي التفسيرات المنجزة: <span class="font-bold text-brand-primary">${i.totalInterpreted || 0}</span></div>
-                <div class="text-[10px] text-brand-accent mt-0.5 font-bold">التقييم: ★ ${i.rating || 5.0}</div>
               </div>
               <span class="text-[10px] px-2 py-0.5 rounded font-medium bg-brand-bg text-brand-primary border border-brand-border">معتمد</span>
             </div>
@@ -1236,88 +1332,62 @@ const App = {
         </div>
       `;
     }
-    // 5. تبويب متابعة المبالغ والمالية
+    // 5. متابعة المبالغ والمالية
     else if (tab === "finance") {
       if (title) title.innerText = "متابعة المبالغ والتدفق المالي";
       if (subtitle)
-        subtitle.innerText =
-          "حساب الإيرادات المحصلة بناءً على تسعيرة الخدمة (11.5 ريال)";
+        subtitle.innerText = "حساب الإيرادات المحصلة ورسوم التفسير المعتمدة";
 
       container.innerHTML = `
         <div class="space-y-6">
           <div class="grid sm:grid-cols-3 gap-4">
             <div class="bg-brand-bg p-4 rounded-xl border border-brand-border">
-              <span class="text-[11px] text-brand-muted block">الإيرادات المحصلة (المكتملة)</span>
+              <span class="text-[11px] text-brand-muted block">الإيرادات المحصلة</span>
               <h4 class="text-xl font-bold text-brand-primary font-display mt-1">${stats.totalRevenue || 0} <span class="text-xs font-normal">ريال</span></h4>
             </div>
             <div class="bg-brand-bg p-4 rounded-xl border border-brand-border">
-              <span class="text-[11px] text-brand-muted block">المبالغ قيد التنفيذ والانتظار</span>
+              <span class="text-[11px] text-brand-muted block">المبالغ قيد الانتظار أو الإعفاء</span>
               <h4 class="text-xl font-bold text-amber-700 font-display mt-1">${stats.pendingRevenue || 0} <span class="text-xs font-normal">ريال</span></h4>
             </div>
             <div class="bg-brand-bg p-4 rounded-xl border border-brand-border">
-              <span class="text-[11px] text-brand-muted block">سعر التفسير الموحد</span>
+              <span class="text-[11px] text-brand-muted block">تسعيرة الرؤيا</span>
               <h4 class="text-xl font-bold text-brand-primary font-display mt-1">11.5 <span class="text-xs font-normal">ريال / طلب</span></h4>
             </div>
           </div>
-
-          <div class="space-y-2">
-            <h5 class="text-xs font-bold text-brand-primary font-display">تفاصيل المعاملات المالية للطلبات</h5>
-            <div class="overflow-x-auto"><table class="w-full text-right text-xs">
-              <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">رقم الطلب</th><th class="p-2.5">المستخدم</th><th class="p-2.5">المبلغ</th><th class="p-2.5">حالة الخدمة</th><th class="p-2.5">التاريخ</th></tr></thead>
-              <tbody class="divide-y divide-brand-border">
-                ${orders
-                  .map(
-                    (o) => `
-                  <tr>
-                    <td class="p-2.5 font-mono text-brand-muted">#${o.id}</td>
-                    <td class="p-2.5 font-medium">${o.userName}</td>
-                    <td class="p-2.5 font-bold text-brand-primary">11.5 ريال</td>
-                    <td class="p-2.5">${this.getStatusBadge(o.status)}</td>
-                    <td class="p-2.5 text-brand-muted">${new Date(o.createdAt).toLocaleDateString("ar-SA")}</td>
-                  </tr>
-                `,
-                  )
-                  .join("")}
-              </tbody>
-            </table></div>
-          </div>
         </div>
       `;
     }
-    // 6. تبويب التقارير والإحصائيات
+    // 6. التقارير والإحصائيات
     else if (tab === "reports") {
       if (title) title.innerText = "التقارير والإحصائيات";
-      if (subtitle)
-        subtitle.innerText = "مؤشرات الأداء التشغيلي وسرعة التجاوب مع الرؤى";
+      if (subtitle) subtitle.innerText = "مؤشرات الأداء ومعدلات الإنجاز";
 
       container.innerHTML = `
-        <div class="space-y-6">
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div class="p-4 border border-brand-border rounded-xl bg-brand-bg/50 space-y-2">
-              <h5 class="font-bold text-xs text-brand-primary font-display">معدل إنجاز الطلبات</h5>
-              <div class="w-full bg-white rounded-full h-3 border border-brand-border overflow-hidden">
-                <div class="bg-brand-primary h-full rounded-full" style="width: ${Math.round((stats.completedOrders / (stats.totalOrders || 1)) * 100)}%"></div>
-              </div>
-              <span class="text-[11px] text-brand-muted block text-left font-mono">${Math.round((stats.completedOrders / (stats.totalOrders || 1)) * 100)}% مكتمل</span>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="p-4 border border-brand-border rounded-xl bg-brand-bg/50 space-y-2">
+            <h5 class="font-bold text-xs text-brand-primary font-display">معدل إنجاز الطلبات</h5>
+            <div class="w-full bg-white rounded-full h-3 border border-brand-border overflow-hidden">
+              <div class="bg-brand-primary h-full rounded-full" style="width: ${Math.round((stats.completedOrders / (stats.totalOrders || 1)) * 100)}%"></div>
             </div>
-
-            <div class="p-4 border border-brand-border rounded-xl bg-brand-bg/50 space-y-2">
-              <h5 class="font-bold text-xs text-brand-primary font-display">متوسط وقت الرد والتفسير</h5>
-              <h4 class="text-lg font-bold text-brand-primary font-display">18 ساعة <span class="text-xs text-brand-muted font-normal">(ضمن معيار 24 ساعة)</span></h4>
-            </div>
+            <span class="text-[11px] text-brand-muted block text-left font-mono">${Math.round((stats.completedOrders / (stats.totalOrders || 1)) * 100)}% مكتمل</span>
+          </div>
+          <div class="p-4 border border-brand-border rounded-xl bg-brand-bg/50 space-y-2">
+            <h5 class="font-bold text-xs text-brand-primary font-display">متوسط وقت الرد والتفسير</h5>
+            <h4 class="text-lg font-bold text-brand-primary font-display">18 ساعة <span class="text-xs text-brand-muted font-normal">(ضمن معيار 24 ساعة)</span></h4>
           </div>
         </div>
       `;
     }
-    // 7. تبويب الشكاوى والمقترحات
+    // 7. إدارة الشكاوى والمقترحات مع إمكانية الرد والإغلاق
     else if (tab === "complaints") {
       if (title) title.innerText = "الشكاوى والمقترحات";
       if (subtitle)
-        subtitle.innerText = "صندوق ملاحظات واستفسارات ومقترحات العملاء";
+        subtitle.innerText =
+          "صندوق ملاحظات واستفسارات ومقترحات العملاء ومتابعتها";
 
       container.innerHTML = `
         <div class="overflow-x-auto"><table class="w-full text-right text-xs">
-          <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">رقم البلاغ</th><th class="p-2.5">المرسل</th><th class="p-2.5">النوع</th><th class="p-2.5">الموضوع</th><th class="p-2.5">الحالة</th><th class="p-2.5">التاريخ</th></tr></thead>
+          <thead class="bg-brand-bg text-brand-muted border-b border-brand-border"><tr><th class="p-2.5">رقم البلاغ</th><th class="p-2.5">المرسل</th><th class="p-2.5">النوع</th><th class="p-2.5">الموضوع</th><th class="p-2.5">الحالة</th><th class="p-2.5">الإجراء</th></tr></thead>
           <tbody class="divide-y divide-brand-border">
             ${complaints
               .map(
@@ -1327,8 +1397,8 @@ const App = {
                 <td class="p-2.5 font-medium">${c.userName}</td>
                 <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-bg text-brand-primary border border-brand-border">${c.type}</span></td>
                 <td class="p-2.5 font-medium text-brand-primary">${c.subject}</td>
-                <td class="p-2.5"><span class="text-emerald-700 font-bold text-[11px]">${c.status}</span></td>
-                <td class="p-2.5 text-brand-muted">${new Date(c.createdAt).toLocaleDateString("ar-SA")}</td>
+                <td class="p-2.5"><span class="${c.status === "مغلقة" ? "text-brand-muted" : "text-amber-700 font-bold"} text-[11px]">${c.status}</span></td>
+                <td class="p-2.5"><button type="button" onclick="App.openComplaintDetail('${c.id}')" class="px-2.5 py-1 bg-white border border-brand-border rounded-lg text-brand-text font-medium text-[11px]">مراجعة والرد</button></td>
               </tr>
             `,
               )
@@ -1337,12 +1407,12 @@ const App = {
         </table></div>
       `;
     }
-    // 8. تبويب إعدادات النظام
+    // 8. إعدادات النظام
     else if (tab === "settings") {
       if (title) title.innerText = "إعدادات النظام والمنصة";
       if (subtitle) subtitle.innerText = "تعديل المتغيرات الأساسية للمشروع";
 
-      const s = (await this.apiRequest("/settings")) || LOCAL_MOCK_DB.settings;
+      const s = LOCAL_MOCK_DB.settings;
       container.innerHTML = `
         <form onsubmit="App.handleSaveSettings(event)" class="max-w-md space-y-3.5 text-xs">
           <div><label class="block font-medium mb-1 text-brand-text">اسم المنصة</label><input type="text" id="setPlatformName" value="${s.platformName || "رؤيا"}" class="w-full px-3 py-2 border border-brand-border rounded-xl"></div>
@@ -1355,26 +1425,40 @@ const App = {
   },
 
   async toggleUserStatus(userId) {
-    await this.apiRequest(`/users/${userId}/toggle`, "PATCH");
+    const u = LOCAL_MOCK_DB.users.find((x) => x.id === userId);
+    if (u) u.status = u.status === "active" ? "inactive" : "active";
     this.showToast("تم تحديث حالة حساب المستخدم", "info");
     this.renderAdminTabContent();
+  },
+
+  async adminToggleUnlock(orderId) {
+    const o = LOCAL_MOCK_DB.orders.find((x) => x.id === orderId);
+    if (o) {
+      o.adminUnlocked = true;
+      this.showToast("تم السماح للرائي بالاطلاع على التفسير مجاناً", "success");
+      this.renderAdminTabContent();
+    }
+  },
+
+  async payOrderFee(orderId) {
+    const o = LOCAL_MOCK_DB.orders.find((x) => x.id === orderId);
+    if (o) {
+      o.isPaid = true;
+      this.showToast(
+        "تم سداد الرسوم (11.5 ريال) وفتح التفسير بالكامل",
+        "success",
+      );
+      this.showOrderDetails(orderId);
+    }
   },
 
   async handleSaveSettings(e) {
     if (e && e.preventDefault) e.preventDefault();
     const platformName = document.getElementById("setPlatformName").value;
     const tagline = document.getElementById("setTagline").value;
-    await this.apiRequest("/settings", "PUT", { platformName, tagline });
+    LOCAL_MOCK_DB.settings.platformName = platformName;
+    LOCAL_MOCK_DB.settings.tagline = tagline;
     this.showToast("تم حفظ الإعدادات بنجاح", "success");
-  },
-
-  async adminForceAssign(orderId) {
-    await this.apiRequest(`/orders/${orderId}/status`, "PATCH", {
-      status: "قيد التفسير",
-      assignedInterpreterId: "int_1",
-    });
-    this.showToast("تم تعيين الطلب للمفسر المعتمد", "success");
-    this.renderAdminTabContent();
   },
 
   openAddInterpreterModal() {
@@ -1387,14 +1471,22 @@ const App = {
   async handleCreateInterpreter(e) {
     if (e && e.preventDefault) e.preventDefault();
     const name = document.getElementById("newIntName").value;
-    const email = document.getElementById("newIntEmail").value;
+    const phone = document.getElementById("newIntPhone").value;
+    const password = document.getElementById("newIntPass").value;
     const specializedIn = document.getElementById("newIntSpec").value;
     const bio = document.getElementById("newIntBio").value;
-    await this.apiRequest("/interpreters", "POST", {
+
+    LOCAL_MOCK_DB.interpreters.push({
+      id: `int_${Date.now()}`,
       name,
-      email,
+      phone,
+      password,
+      role: "Interpreter",
+      status: "active",
       specializedIn,
       bio,
+      totalInterpreted: 0,
+      rating: 5.0,
     });
     this.showToast("تمت إضافة المفسر بنجاح", "success");
     this.closeAddInterpreterModal();
@@ -1411,13 +1503,14 @@ const App = {
   async handleCreateUser(e) {
     if (e && e.preventDefault) e.preventDefault();
     const name = document.getElementById("newUsrName").value;
-    const email = document.getElementById("newUsrEmail").value;
     const phone = document.getElementById("newUsrPhone").value;
+    const password = document.getElementById("newUsrPass").value;
+
     LOCAL_MOCK_DB.users.push({
       id: `usr_${Date.now()}`,
       name,
-      email,
       phone,
+      password,
       role: "User",
       status: "active",
       createdAt: new Date().toISOString(),
@@ -1439,6 +1532,7 @@ const App = {
     const type = document.getElementById("complaintType").value;
     const subject = document.getElementById("complaintSubject").value;
     const text = document.getElementById("complaintText").value;
+
     LOCAL_MOCK_DB.complaints.push({
       id: `CMP-${Date.now()}`,
       userId: this.state.currentUser ? this.state.currentUser.id : "usr_1",
@@ -1446,11 +1540,66 @@ const App = {
       type,
       subject,
       text,
-      status: "تم الاستلام",
+      status: "جديدة وقيد المراجعة",
+      adminReply: null,
       createdAt: new Date().toISOString(),
     });
-    this.showToast("تم إرسال رسالتك للإدارة بنجاح", "success");
+    this.showToast("تم إرسال رسالتك للإدارة مجاناً بنجاح", "success");
     this.closeAddComplaintModal();
+  },
+
+  openComplaintDetail(complaintId) {
+    const c = LOCAL_MOCK_DB.complaints.find((x) => x.id === complaintId);
+    if (!c) return;
+
+    const modal = document.getElementById("complaintDetailModal");
+    const content = document.getElementById("complaintDetailModalContent");
+    if (!modal || !content) return;
+
+    content.innerHTML = `
+      <div class="flex justify-between items-center pb-3 border-b border-brand-border mb-3">
+        <div>
+          <h4 class="text-sm font-bold text-brand-primary font-display">${c.type}: ${c.subject}</h4>
+          <span class="text-[10px] text-brand-muted">المرسل: ${c.userName}</span>
+        </div>
+        <button type="button" onclick="App.closeComplaintDetail()" class="text-brand-muted"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="bg-brand-bg p-3 rounded-xl border border-brand-border">
+          <span class="font-bold text-brand-primary block mb-1">نص الرسالة:</span>
+          <p class="text-brand-text leading-relaxed whitespace-pre-wrap">${c.text}</p>
+        </div>
+
+        <form onsubmit="App.handleReplyAndCloseComplaint(event, '${c.id}')" class="space-y-2">
+          <label class="block font-bold text-brand-primary">رد الإدارة وإغلاق البلاغ:</label>
+          <textarea id="replyText" rows="3" required placeholder="اكتب رد الإدارة على العميل..." class="w-full p-2.5 border border-brand-border rounded-xl text-xs outline-none focus:border-brand-primary">${c.adminReply || ""}</textarea>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="App.closeComplaintDetail()" class="px-4 py-2 border rounded-xl">إلغاء</button>
+            <button type="submit" class="px-5 py-2 bg-brand-primary text-white font-medium rounded-xl">إرسال الرد وإغلاق الشكوى</button>
+          </div>
+        </form>
+      </div>
+    `;
+    modal.classList.remove("hidden");
+  },
+
+  closeComplaintDetail() {
+    document.getElementById("complaintDetailModal")?.classList.add("hidden");
+  },
+
+  async handleReplyAndCloseComplaint(e, complaintId) {
+    if (e && e.preventDefault) e.preventDefault();
+    const replyText = document.getElementById("replyText").value;
+    const c = LOCAL_MOCK_DB.complaints.find((x) => x.id === complaintId);
+    if (c) {
+      c.adminReply = replyText;
+      c.status = "مغلقة ومجاب عليها";
+      c.closedAt = new Date().toISOString();
+    }
+    this.showToast("تم إرسال الرد وإغلاق التذكرة بنجاح", "success");
+    this.closeComplaintDetail();
+    this.renderAdminTabContent();
   },
 
   // ===================== لوحة المتابع والممول =====================
@@ -1471,9 +1620,8 @@ const App = {
 
     const tab = this.state.obsActiveTab;
     const stats = await this.apiRequest("/admin/stats");
-    const orders = (await this.apiRequest("/orders")) || [];
-    const interpreters = (await this.apiRequest("/interpreters")) || [];
-    const users = (await this.apiRequest("/users")) || [];
+    const orders = LOCAL_MOCK_DB.orders;
+    const interpreters = LOCAL_MOCK_DB.interpreters;
 
     if (kpi) {
       kpi.innerHTML = `
@@ -1512,7 +1660,7 @@ const App = {
       `;
     } else if (tab === "interpreters") {
       container.innerHTML = `
-        <div class="grid sm:grid-cols-2 gap-4">
+        <div class="grid sm:grid-cols-2 gap-3">
           ${interpreters
             .map(
               (i) => `
@@ -1531,16 +1679,15 @@ const App = {
         <div class="p-5 bg-brand-bg border border-brand-border rounded-xl space-y-2 text-xs">
           <span class="text-brand-muted block">الإيراد التراكمي المحقق</span>
           <h3 class="text-2xl font-bold text-brand-primary font-display">${stats.totalRevenue || 0} ريال</h3>
-          <p class="text-brand-muted text-[11px]">تفسير بمقابل 11.5 ريال لكل رؤيا مكتملة ومسلمة.</p>
+          <p class="text-brand-muted text-[11px]">بناءً على تسعيرة 11.5 ريال لكل طلب مدفوع.</p>
         </div>
       `;
     }
   },
 
-  // ===================== صفحة تفاصيل الطلب بنظام Timeline =====================
+  // ===================== تفاصيل الطلب مع حجب التفسير حتى السداد/الإعفاء =====================
   async showOrderDetails(orderId) {
-    const orders = (await this.apiRequest("/orders")) || [];
-    const order = orders.find((o) => o.id === orderId);
+    const order = LOCAL_MOCK_DB.orders.find((o) => o.id === orderId);
     if (!order) return;
 
     const modal = document.getElementById("orderDetailsModal");
@@ -1552,6 +1699,12 @@ const App = {
       order.status === "تم التفسير" ||
       order.status === "تم التسليم";
     const isInProgress = order.status === "قيد التفسير" || isDone;
+    const isUnlocked =
+      order.isPaid ||
+      order.adminUnlocked ||
+      this.state.currentRole === "Admin" ||
+      this.state.currentRole === "Interpreter" ||
+      this.state.currentRole === "Observer";
 
     content.innerHTML = `
       <div class="flex justify-between items-center pb-3.5 border-b border-brand-border mb-4">
@@ -1610,31 +1763,48 @@ const App = {
           }
         </div>
 
-        <!-- نتيجة التفسير إن وجد -->
+        <!-- نتيجة التفسير (مع الحجب الذكي في حال عدم السداد أو الإعفاء) -->
         ${
           order.interpretation
             ? `
-          <div class="bg-brand-bg border border-brand-border p-4 rounded-xl space-y-2">
-            <div class="flex items-center justify-between">
-              <h5 class="font-bold text-brand-primary flex items-center gap-1.5 font-display"><i class="fa-solid fa-feather-pointed text-brand-accent"></i> تفسير: ${order.interpretation.interpreterName}</h5>
-              <span class="text-[10px] text-brand-muted">${new Date(order.interpretation.createdAt).toLocaleDateString("ar-SA")}</span>
-            </div>
-            <p class="text-brand-text leading-relaxed font-serif text-sm">${order.interpretation.text}</p>
-            ${
-              order.interpretation.audioUrl
-                ? `
-              <div class="pt-2">
-                <span class="text-[10px] font-bold text-brand-muted block mb-1">التفسير الصوتي للمفسر:</span>
-                <audio controls src="${order.interpretation.audioUrl}" class="w-full h-8"></audio>
+          ${
+            isUnlocked
+              ? `
+            <div class="bg-brand-bg border border-brand-border p-4 rounded-xl space-y-2">
+              <div class="flex items-center justify-between">
+                <h5 class="font-bold text-brand-primary flex items-center gap-1.5 font-display"><i class="fa-solid fa-feather-pointed text-brand-accent"></i> تفسير: ${order.interpretation.interpreterName}</h5>
+                <span class="text-[10px] text-brand-muted">${new Date(order.interpretation.createdAt).toLocaleDateString("ar-SA")}</span>
               </div>
-            `
-                : ""
-            }
-          </div>
+              <p class="text-brand-text leading-relaxed font-serif text-sm">${order.interpretation.text}</p>
+              ${
+                order.interpretation.audioUrl
+                  ? `
+                <div class="pt-2">
+                  <span class="text-[10px] font-bold text-brand-muted block mb-1">التفسير الصوتي للمفسر:</span>
+                  <audio controls src="${order.interpretation.audioUrl}" class="w-full h-8"></audio>
+                </div>
+              `
+                  : ""
+              }
+            </div>
+          `
+              : `
+            <div class="bg-amber-50/80 border border-amber-200 p-5 rounded-xl text-center space-y-3">
+              <div class="w-10 h-10 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mx-auto text-base">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+              <h5 class="font-bold text-brand-primary text-sm font-display">تم الانتهاء من تفسير رؤيتك من قبل الشيخ</h5>
+              <p class="text-xs text-brand-muted max-w-xs mx-auto">للاطلاع والاستماع إلى التفسير الكامل، يرجى سداد رسوم الخدمة الرمزية (11.5 ريال).</p>
+              <button type="button" onclick="App.payOrderFee('${order.id}')" class="px-6 py-2.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-bold text-xs rounded-xl shadow transition">
+                سداد الرسوم (11.5 ريال) وفتح التفسير
+              </button>
+            </div>
+          `
+          }
         `
             : `
           <div class="text-center p-5 bg-brand-bg rounded-xl border border-dashed border-brand-border text-brand-muted text-xs">
-            الرؤيا قيد التأمل والمراجعة من قبل المفسر المعتمد، وسيظهر التفسير هنا فور اعتماده.
+            الرؤيا قيد التأمل والمراجعة من قبل المفسر المعتمد، وستصلك رسالة باكتمالها فوراً.
           </div>
         `
         }
@@ -1670,13 +1840,11 @@ const App = {
   },
 
   async fetchInterpretersPublic() {
-    this.state.interpreters =
-      (await this.apiRequest("/interpreters")) || LOCAL_MOCK_DB.interpreters;
+    this.state.interpreters = LOCAL_MOCK_DB.interpreters;
   },
 
   async fetchSettings() {
-    this.state.settings =
-      (await this.apiRequest("/settings")) || LOCAL_MOCK_DB.settings;
+    this.state.settings = LOCAL_MOCK_DB.settings;
   },
 
   showToast(message, type = "success") {
