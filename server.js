@@ -9,6 +9,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// دعم مسار المجلد الرئيسي مباشرة ومجلد public أيضاً لتفادي أي خطأ
+app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Middleware للتحقق من هوية وصلاحية المستخدم
@@ -32,29 +35,40 @@ app.post("/api/auth/login", (req, res) => {
 
   const cleanEmail = email.trim().toLowerCase();
 
+  // فحص المتابع / الممول
+  const observer = data.observers?.find(
+    (o) => o.email.toLowerCase() === cleanEmail,
+  );
+  if (observer) {
+    return res.json({ user: observer, role: "Observer", token: "token-obs" });
+  }
+
   // فحص المدير العام
   const admin = data.admins.find((a) => a.email.toLowerCase() === cleanEmail);
-  if (admin)
+  if (admin) {
     return res.json({ user: admin, role: "Admin", token: "token-admin" });
+  }
 
   // فحص المفسرين
   const interpreter = data.interpreters.find(
     (i) => i.email.toLowerCase() === cleanEmail,
   );
-  if (interpreter)
+  if (interpreter) {
     return res.json({
       user: interpreter,
       role: "Interpreter",
       token: "token-int",
     });
+  }
 
   // فحص المستخدمين
   let user = data.users.find((u) => u.email.toLowerCase() === cleanEmail);
   if (user) {
-    if (user.status === "inactive")
+    if (user.status === "inactive") {
       return res
         .status(403)
         .json({ error: "تم تعطيل هذا الحساب من قبل الإدارة" });
+    }
     return res.json({ user, role: "User", token: "token-user" });
   }
 
@@ -87,8 +101,8 @@ app.get("/api/orders", (req, res) => {
       (o) => !o.assignedInterpreterId || o.assignedInterpreterId === userId,
     );
   }
+  // المتابع والمدير العام يستعرضان كامل الطلبات
 
-  // دمج بيانات التفسير المعتمدة مع كل طلب
   const enriched = results.map((order) => {
     const interpretation = data.interpretations.find(
       (i) => i.orderId === order.id,
@@ -140,7 +154,6 @@ app.post("/api/orders", (req, res) => {
 
   data.orders.push(newOrder);
 
-  // إشعار فوري للرائي
   data.notifications.push({
     id: `notif_${Date.now()}`,
     userId: newOrder.userId,
@@ -183,7 +196,6 @@ app.patch("/api/orders/:id/status", (req, res) => {
   res.json(data.orders[orderIndex]);
 });
 
-// 3. تقديم التفسير من المفسر المعتمد (نصي وصوتي)
 app.post("/api/orders/:id/interpret", (req, res) => {
   const { id } = req.params;
   const { text, audioUrl, internalNotes, interpreterId, interpreterName } =
@@ -213,12 +225,10 @@ app.post("/api/orders/:id/interpret", (req, res) => {
     data.interpretations.push(interp);
   }
 
-  // تحديث حالة الطلب إلى تم التسليم
   order.status = "تم التسليم";
   order.assignedInterpreterId = interp.interpreterId;
   order.updatedAt = new Date().toISOString();
 
-  // زيادة عدد التفسيرات للمفسر
   const interpreterObj = data.interpreters.find(
     (i) => i.id === interp.interpreterId,
   );
@@ -226,7 +236,6 @@ app.post("/api/orders/:id/interpret", (req, res) => {
     interpreterObj.totalInterpreted =
       (interpreterObj.totalInterpreted || 0) + 1;
 
-  // إشعار المستخدم
   data.notifications.push({
     id: `notif_${Date.now()}`,
     userId: order.userId,
@@ -241,7 +250,6 @@ app.post("/api/orders/:id/interpret", (req, res) => {
   res.json({ order, interpretation: interp });
 });
 
-// 4. الإحصائيات ولوحة الإدارة
 app.get("/api/admin/stats", (req, res) => {
   const data = db.get();
   const totalUsers = data.users.length;
@@ -349,5 +357,5 @@ app.post("/api/admin/reset-demo", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`منصة تعبير الليلية تعمل الآن على: http://localhost:${PORT}`);
+  console.log(`منصة تعبير تعمل الآن على: http://localhost:${PORT}`);
 });
