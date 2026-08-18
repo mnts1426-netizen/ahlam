@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>رؤيا | منصة تفسير الرؤى والأحلام</title>
+
+    <!-- الخطوط: IBM Plex Sans Arabic & Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"IBM Plex Sans Arabic"', "Tajawal", "sans-serif"],
+              display: ["Tajawal", '"IBM Plex Sans Arabic"', "sans-serif"],
+            },
+            colors: {
+              brand: {
+                primary: "#173F35",
+                primaryHover: "#12322A",
+                accent: "#C8A96B",
+                accentLight: "#F5EEDB",
+                bg: "#F8F6F0",
+                card: "#FFFFFF",
+                text: "#26332F",
+                muted: "#68736F",
+                border: "#E5E7E4",
+                borderHover: "#D0D4CE",
+              },
+            },
+            boxShadow: {
+              subtle: "0 2px 10px rgba(23, 63, 53, 0.03)",
+              card: "0 4px 20px rgba(23, 63, 53, 0.05)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #f8f6f0;
+        color: #26332f;
+        font-family: "IBM Plex Sans Arabic", sans-serif;
+      }
+      .recording-pulse {
+        animation: pulseRing 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      }
+      @keyframes pulseRing {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(200, 169, 107, 0.5);
+        }
+        70% {
+          transform: scale(1.03);
+          box-shadow: 0 0 0 16px rgba(200, 169, 107, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(200, 169, 107, 0);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-primary selection:text-white"
+  >
+    <!-- شريط التبديل التجريبي (يظهر فقط وحصرياً في الواجهة العامة للزوار) -->
+    <div
+      id="demoTopBar"
+      class="bg-brand-primary text-white/85 text-xs py-2 px-4 sticky top-0 z-50 border-b border-brand-primaryHover"
+    >
+      <div
+        class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2"
+      >
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span
+            class="text-[11px] font-medium text-brand-accent ml-2 flex items-center gap-1.5"
+          >
+            <i class="fa-solid fa-arrows-rotate text-[10px]"></i> تجربة
+            الحسابات:
+          </span>
+          <button
+            type="button"
+            onclick="App.quickSwitchRole('User', 'user@demo.com')"
+            class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded-md text-[11px] font-medium transition"
+          >
+            عمر (مستخدم)
+          </button>
+          <button
+            type="button"
+            onclick="App.quickSwitchRole('User', 'fatima@demo.com')"
+            class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded-md text-[11px] font-medium transition"
+          >
+            فاطمة (مستخدم)
+          </button>
+          <button
+            type="button"
+            onclick="App.quickSwitchRole('Interpreter', 'sheikh@demo.com')"
+            class="px-2.5 py-1 bg-brand-accent/20 text-brand-accentLight hover:bg-brand-accent/30 rounded-md text-[11px] font-semibold transition"
+          >
+            الشيخ أحمد (مفسر)
+          </button>
+          <button
+            type="button"
+            onclick="App.quickSwitchRole('Admin', 'admin@demo.com')"
+            class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded-md text-[11px] font-medium transition"
+          >
+            المدير العام
+          </button>
+          <button
+            type="button"
+            onclick="App.quickSwitchRole('Observer', 'observer@demo.com')"
+            class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded-md text-[11px] font-medium transition"
+          >
+            المتابع / الممول
+          </button>
+        </div>
+        <button
+          type="button"
+          onclick="App.resetData()"
+          class="text-white/60 hover:text-white text-[11px] font-medium transition flex items-center gap-1"
+        >
+          <i class="fa-solid fa-rotate-left text-[10px]"></i> استعادة البيانات
+        </button>
+      </div>
+    </div>
+
+    <!-- الهيدر العام للزوار (يظهر فقط في الواجهة التعريفية) -->
+    <header
+      id="publicHeader"
+      class="bg-white border-b border-brand-border sticky top-8 z-40"
+    >
+      <div
+        class="max-w-6xl mx-auto px-4 sm:px-6 h-18 py-3.5 flex items-center justify-between"
+      >
+        <!-- الشعار -->
+        <div
+          class="flex items-center gap-2.5 cursor-pointer"
+          onclick="App.navigate('landing')"
+        >
+          <div
+            class="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-brand-accent text-sm shadow-sm"
+          >
+            <i class="fa-solid fa-feather-pointed"></i>
+          </div>
+          <div>
+            <h1
+              class="text-xl font-bold tracking-tight text-brand-primary font-display leading-none"
+            >
+              رؤيا
+            </h1>
+            <p class="text-[10px] text-brand-muted font-normal mt-0.5">
+              تفسير الرؤى والأحلام
+            </p>
+          </div>
+        </div>
+
+        <!-- روابط الواجهة العامة -->
+        <nav
+          class="hidden md:flex items-center gap-7 text-sm font-medium text-brand-muted"
+        >
+          <a
+            href="#how-it-works"
+            onclick="App.navigate('landing')"
+            class="hover:text-brand-primary transition"
+            >كيف تعمل؟</a
+          >
+          <a
+            href="#why-ruya"
+            onclick="App.navigate('landing')"
+            class="hover:text-brand-primary transition"
+            >لماذا رؤيا؟</a
+          >
+          <a
+            href="#interpreter"
+            onclick="App.navigate('landing')"
+            class="hover:text-brand-primary transition"
+            >المفسر</a
+          >
+          <a
+            href="#pricing"
+            onclick="App.navigate('landing')"
+            class="hover:text-brand-primary transition"
+            >الأسعار</a
+          >
+          <a
+            href="#faq"
+            onclick="App.navigate('landing')"
+            class="hover:text-brand-primary transition"
+            >الأسئلة الشائعة</a
+          >
+        </nav>
+
+        <!-- أزرار الدخول -->
+        <div class="flex items-center gap-2.5" id="authNavControls"></div>
+      </div>
+    </header>
+
+    <!-- المساحة المركزية للمشروع -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
+      <!-- 1. الواجهة العامة المستقلة بالكامل (Landing Page) -->
+      <section id="viewLanding" class="view-section space-y-20 sm:space-y-28">
+        <!-- Hero Section -->
+        <div class="pt-6 sm:pt-10 pb-4 text-center max-w-3xl mx-auto">
+          <div
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-brand-border text-brand-text text-xs font-medium mb-6 shadow-subtle"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-accent"></span>
+            <span>منصة موثوقة لتعبير الرؤى بضوابط شرعية</span>
+          </div>
+
+          <h2
+            class="text-3xl sm:text-5xl font-extrabold text-brand-primary font-display leading-[1.3] tracking-tight mb-5"
+          >
+            رؤيتك بين يدي
+            <span class="text-brand-accent inline-block relative"
+              >مفسر موثوق</span
+            >
+          </h2>
+
+          <p
+            class="text-base sm:text-lg text-brand-muted max-w-xl mx-auto mb-8 font-normal leading-relaxed"
+          >
+            أرسل رؤيتك بسهولة، واستلم تفسيرها من مفسر موثوق عبر منصة بسيطة
+            وسريعة.
+          </p>
+
+          <div
+            class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto mb-10"
+          >
+            <button
+              type="button"
+              onclick="App.handleSendDreamClick()"
+              class="w-full sm:w-auto px-7 py-3.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-medium text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2"
+            >
+              <i class="fa-solid fa-microphone text-brand-accent text-xs"></i>
+              <span>أرسل رؤيتك</span>
+            </button>
+            <a
+              href="#how-it-works"
+              class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-brand-bg border border-brand-border text-brand-text font-medium text-sm rounded-xl transition"
+            >
+              كيف تعمل المنصة؟
+            </a>
+          </div>
+        </div>
+
+        <!-- قسم كيف تعمل؟ -->
+        <div id="how-it-works" class="scroll-mt-24">
+          <div class="text-center max-w-md mx-auto mb-12">
+            <h3 class="text-2xl font-bold text-brand-primary font-display mb-2">
+              كيف تعمل؟
+            </h3>
+            <p class="text-brand-muted text-sm">
+              ثلاث خطوات بسيطة وميسرة لاستلام التعبير
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-6">
+            <div
+              class="bg-white p-7 rounded-2xl border border-brand-border shadow-subtle text-right"
+            >
+              <span
+                class="text-brand-accent font-bold text-3xl font-display mb-3 block"
+                >01</span
+              >
+              <h4 class="text-base font-bold text-brand-primary mb-1.5">
+                أرسل رؤيتك
+              </h4>
+              <p class="text-brand-muted text-xs leading-relaxed">
+                سجل رؤيتك صوتيًا أو اكتبها بتفاصيلها عبر نموذج مخصص وسهل.
+              </p>
+            </div>
+
+            <div
+              class="bg-white p-7 rounded-2xl border border-brand-border shadow-subtle text-right"
+            >
+              <span
+                class="text-brand-accent font-bold text-3xl font-display mb-3 block"
+                >02</span
+              >
+              <h4 class="text-base font-bold text-brand-primary mb-1.5">
+                يستلمها المفسر
+              </h4>
+              <p class="text-brand-muted text-xs leading-relaxed">
+                تصل الرؤيا إلى المفسر لمراجعتها وتأمل رموزها وحال الرائي.
+              </p>
+            </div>
+
+            <div
+              class="bg-white p-7 rounded-2xl border border-brand-border shadow-subtle text-right"
+            >
+              <span
+                class="text-brand-accent font-bold text-3xl font-display mb-3 block"
+                >03</span
+              >
+              <h4 class="text-base font-bold text-brand-primary mb-1.5">
+                استلم التفسير
+              </h4>
+              <p class="text-brand-muted text-xs leading-relaxed">
+                يصلك التفسير الوافي كتابيًا أو صوتيًا داخل حسابك في المنصة.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم لماذا رؤيا؟ -->
+        <div id="why-ruya" class="scroll-mt-24">
+          <div
+            class="bg-white border border-brand-border rounded-2xl p-8 sm:p-12 shadow-subtle"
+          >
+            <div class="text-center max-w-md mx-auto mb-10">
+              <h3
+                class="text-2xl font-bold text-brand-primary font-display mb-2"
+              >
+                لماذا رؤيا؟
+              </h3>
+              <p class="text-brand-muted text-sm">
+                بيئة مصممة لضمان راحة الرائي وموثوقية التعبير
+              </p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div class="space-y-2">
+                <div
+                  class="w-9 h-9 rounded-lg bg-brand-bg text-brand-primary flex items-center justify-center text-sm mb-3"
+                >
+                  <i class="fa-solid fa-user-check"></i>
+                </div>
+                <h5 class="font-bold text-brand-primary text-sm">مفسر موثوق</h5>
+                <p class="text-xs text-brand-muted leading-relaxed">
+                  دراسة دقيقة للرؤى وفق الضوابط الشرعية المعتبرة.
+                </p>
+              </div>
+
+              <div class="space-y-2">
+                <div
+                  class="w-9 h-9 rounded-lg bg-brand-bg text-brand-primary flex items-center justify-center text-sm mb-3"
+                >
+                  <i class="fa-solid fa-lock"></i>
+                </div>
+                <h5 class="font-bold text-brand-primary text-sm">
+                  خصوصية وأمان
+                </h5>
+                <p class="text-xs text-brand-muted leading-relaxed">
+                  بياناتك ورؤاك مشفرة ولا يطلع عليها إلا المفسر المختص.
+                </p>
+              </div>
+
+              <div class="space-y-2">
+                <div
+                  class="w-9 h-9 rounded-lg bg-brand-bg text-brand-primary flex items-center justify-center text-sm mb-3"
+                >
+                  <i class="fa-solid fa-bolt"></i>
+                </div>
+                <h5 class="font-bold text-brand-primary text-sm">
+                  سرعة في الاستقبال
+                </h5>
+                <p class="text-xs text-brand-muted leading-relaxed">
+                  معالجة سريعة لطلبك دون الحاجة لانتظار البرامج والقنوات.
+                </p>
+              </div>
+
+              <div class="space-y-2">
+                <div
+                  class="w-9 h-9 rounded-lg bg-brand-bg text-brand-primary flex items-center justify-center text-sm mb-3"
+                >
+                  <i class="fa-solid fa-list-check"></i>
+                </div>
+                <h5 class="font-bold text-brand-primary text-sm">
+                  متابعة واضحة
+                </h5>
+                <p class="text-xs text-brand-muted leading-relaxed">
+                  تتبع مباشر لكل خطوة يمر بها طلبك من الإرسال حتى الاعتماد.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم المفسر المعتمد -->
+        <div id="interpreter" class="scroll-mt-24">
+          <div class="text-center max-w-md mx-auto mb-8">
+            <h3 class="text-2xl font-bold text-brand-primary font-display mb-2">
+              المفسر المعتمد
+            </h3>
+            <p class="text-brand-muted text-sm">
+              الرؤى تُعرض على مفسرين ذوي دراية وخبرة شرعية
+            </p>
+          </div>
+
+          <div
+            class="max-w-xl mx-auto bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-subtle flex flex-col sm:flex-row items-center gap-6 text-center sm:text-right"
+          >
+            <div
+              class="w-20 h-20 rounded-2xl bg-brand-bg text-brand-primary flex items-center justify-center text-3xl flex-shrink-0 border border-brand-border"
+            >
+              <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div class="space-y-1.5 flex-grow">
+              <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              >
+                <h4 class="text-lg font-bold text-brand-primary font-display">
+                  الشيخ أحمد المنصور
+                </h4>
+                <span
+                  class="inline-block text-[11px] font-semibold bg-brand-bg text-brand-primary px-2.5 py-0.5 rounded-full self-center sm:self-auto border border-brand-border"
+                  >مفسر رؤى</span
+                >
+              </div>
+              <p class="text-xs text-brand-muted leading-relaxed">
+                ممارس في علم تعبير الرؤى لأكثر من 15 عاماً وفق الكتاب والسنة
+                والضوابط الأصولية.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم السعر -->
+        <div id="pricing" class="scroll-mt-24">
+          <div
+            class="max-w-md mx-auto bg-white border border-brand-border rounded-2xl p-8 shadow-card text-center space-y-6"
+          >
+            <div>
+              <span
+                class="text-xs font-semibold text-brand-muted uppercase tracking-wider"
+                >الخدمة الأساسية</span
+              >
+              <h4
+                class="text-xl font-bold text-brand-primary font-display mt-1"
+              >
+                تفسير رؤيتك
+              </h4>
+            </div>
+
+            <div class="py-2">
+              <div
+                class="text-4xl font-extrabold text-brand-primary font-display"
+              >
+                11.5
+                <span class="text-sm font-medium text-brand-muted">ريال</span>
+              </div>
+              <p class="text-xs text-brand-muted mt-1">
+                شامل المراجعة والتفسير الوافي
+              </p>
+            </div>
+
+            <ul
+              class="text-xs text-brand-text space-y-2.5 text-right border-t border-b border-brand-border py-5 font-normal"
+            >
+              <li class="flex items-center gap-2.5">
+                <i class="fa-solid fa-check text-brand-accent text-xs"></i> أرسل
+                رؤيتك صوتيًا أو كتابيًا
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i class="fa-solid fa-check text-brand-accent text-xs"></i> تابع
+                حالة طلبك خطوة بخطوة
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i class="fa-solid fa-check text-brand-accent text-xs"></i>
+                استلم التفسير داخل حسابك في المنصة
+              </li>
+            </ul>
+
+            <button
+              type="button"
+              onclick="App.handleSendDreamClick()"
+              class="w-full py-3.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-medium text-sm rounded-xl shadow-sm transition"
+            >
+              ابدأ الآن
+            </button>
+          </div>
+        </div>
+
+        <!-- الأسئلة الشائعة -->
+        <div id="faq" class="scroll-mt-24 max-w-2xl mx-auto space-y-4">
+          <div class="text-center mb-8">
+            <h3
+              class="text-2xl font-bold text-brand-primary font-display mb-1.5"
+            >
+              الأسئلة الشائعة
+            </h3>
+            <p class="text-brand-muted text-xs">
+              إجابات سريعة على أهم الاستفسارات
+            </p>
+          </div>
+
+          <div
+            class="bg-white border border-brand-border rounded-xl p-5 shadow-subtle"
+          >
+            <h5 class="text-sm font-bold text-brand-primary mb-1">
+              هل يمكنني تسجيل الرؤيا بصوتي؟
+            </h5>
+            <p class="text-xs text-brand-muted leading-relaxed">
+              نعم، تتيح المنصة مسجل صوت مدمج يعمل مباشرة من هاتفك أو جهازك بكل
+              وضوح وسهولة.
+            </p>
+          </div>
+
+          <div
+            class="bg-white border border-brand-border rounded-xl p-5 shadow-subtle"
+          >
+            <h5 class="text-sm font-bold text-brand-primary mb-1">
+              كم يستغرق استلام التفسير؟
+            </h5>
+            <p class="text-xs text-brand-muted leading-relaxed">
+              يتم تفسير الرؤيا والرد خلال 24 إلى 48 ساعة كحد أقصى بحسب جدول
+              المفسر.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. هيكل لوحات التحكم المستقلة بالكامل مع القائمة الجانبية (Sidebar) -->
+      <div id="dashboardWrapper" class="hidden flex flex-col md:flex-row gap-6">
+        <!-- القائمة الجانبية المخصصة لكل دور -->
+        <aside class="w-full md:w-64 flex-shrink-0">
+          <div
+            class="bg-white border border-brand-border rounded-2xl p-4 shadow-subtle sticky top-6 space-y-5 flex flex-col justify-between min-h-[500px]"
+          >
+            <div class="space-y-4">
+              <!-- بطاقة المستخدم الحالية والشعار الداخلي -->
+              <div
+                class="flex items-center gap-2.5 pb-3 border-b border-brand-border"
+              >
+                <div
+                  class="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-brand-accent text-sm"
+                >
+                  <i class="fa-solid fa-feather-pointed"></i>
+                </div>
+                <div>
+                  <h2
+                    class="text-base font-bold text-brand-primary font-display leading-none"
+                  >
+                    رؤيا
+                  </h2>
+                  <span
+                    class="text-[10px] text-brand-muted"
+                    id="sidebarRoleBadge"
+                    >لوحة التحكم</span
+                  >
+                </div>
+              </div>
+
+              <!-- بطاقة بيانات الحساب -->
+              <div
+                id="sidebarUserCard"
+                class="bg-brand-bg p-3 rounded-xl border border-brand-border"
+              ></div>
+
+              <!-- روابط التنقل المخصصة للدور -->
+              <nav class="space-y-1" id="sidebarNavLinks"></nav>
+            </div>
+
+            <!-- زر تسجيل الخروج الثابت في الأسفل للعودة للواجهة العامة -->
+            <div class="pt-3 border-t border-brand-border">
+              <button
+                type="button"
+                onclick="App.clearSession()"
+                class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 transition border border-red-100"
+              >
+                <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                <span>تسجيل الخروج</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- مساحة عرض لوحات الأدوار المستقلة -->
+        <div class="flex-grow min-w-0">
+          <!-- صفحة إنشاء طلب تفسير جديد (Voice + Text) -->
+          <section id="viewNewOrder" class="view-section hidden">
+            <div
+              class="bg-white rounded-2xl border border-brand-border p-6 sm:p-8 shadow-subtle space-y-6"
+            >
+              <div
+                class="border-b border-brand-border pb-4 flex justify-between items-center"
+              >
+                <div>
+                  <h3 class="text-xl font-bold text-brand-primary font-display">
+                    أرسل رؤيتك
+                  </h3>
+                  <p class="text-xs text-brand-muted mt-0.5">
+                    يمكنك كتابة رؤيتك أو تسجيلها صوتيًا
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onclick="App.navigate('userDashboard')"
+                  class="px-3 py-1.5 bg-white hover:bg-brand-bg border border-brand-border text-brand-muted hover:text-brand-primary text-xs font-medium rounded-lg transition"
+                >
+                  رجوع لطلباتي
+                </button>
+              </div>
+
+              <form
+                id="newOrderForm"
+                onsubmit="App.handleCreateOrder(event)"
+                class="space-y-6"
+              >
+                <div>
+                  <label class="block text-xs font-bold text-brand-text mb-1.5"
+                    >عنوان مختصر للرؤيا *</label
+                  >
+                  <input
+                    type="text"
+                    id="orderTitle"
+                    required
+                    placeholder="مثال: رؤية المطر في الحرم..."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-brand-border text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition"
+                  />
+                </div>
+
+                <!-- استوديو التسجيل الصوتي الحديث -->
+                <div
+                  class="bg-brand-bg border border-brand-border rounded-2xl p-6 text-center space-y-3"
+                >
+                  <span class="text-xs font-bold text-brand-primary block"
+                    >التسجيل الصوتي للرؤيا</span
+                  >
+                  <p class="text-[11px] text-brand-muted">
+                    تحدث براحة واشرح ما رأيته دون الحاجة للكتابة
+                  </p>
+
+                  <div
+                    class="flex flex-col items-center justify-center pt-2 gap-3"
+                  >
+                    <button
+                      type="button"
+                      id="recordBtn"
+                      onclick="App.toggleRecording()"
+                      class="w-16 h-16 rounded-full bg-brand-primary text-white flex items-center justify-center text-xl shadow transition transform active:scale-95"
+                    >
+                      <i
+                        class="fa-solid fa-microphone text-brand-accent"
+                        id="recordIcon"
+                      ></i>
+                    </button>
+
+                    <div
+                      id="recordingTimer"
+                      class="text-xs font-mono font-bold text-brand-primary hidden"
+                    >
+                      00:00
+                    </div>
+                    <span
+                      id="recordStatusText"
+                      class="text-[11px] text-brand-muted"
+                      >اضغط على الميكروفون لبدء التسجيل</span
+                    >
+
+                    <div
+                      id="audioPreviewContainer"
+                      class="w-full max-w-sm hidden mt-2 space-y-2"
+                    >
+                      <audio
+                        id="audioPreview"
+                        controls
+                        class="w-full h-8"
+                      ></audio>
+                      <button
+                        type="button"
+                        onclick="App.removeRecording()"
+                        class="text-[11px] text-red-600 hover:underline font-medium"
+                      >
+                        <i class="fa-solid fa-trash text-[10px]"></i> حذف وإعادة
+                        التسجيل
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-brand-text mb-1.5"
+                    >أو اكتب رؤيتك بالتفصيل</label
+                  >
+                  <textarea
+                    id="orderDreamText"
+                    rows="4"
+                    placeholder="اكتب رؤيتك بالتفصيل هنا..."
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-brand-border text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition"
+                  ></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  <div>
+                    <label
+                      class="block text-[11px] font-medium text-brand-muted mb-1"
+                      >تاريخ الرؤيا</label
+                    >
+                    <input
+                      type="date"
+                      id="orderDate"
+                      class="w-full px-3 py-2 rounded-xl border border-brand-border text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-[11px] font-medium text-brand-muted mb-1"
+                      >الحالة الاجتماعية</label
+                    >
+                    <select
+                      id="orderMarital"
+                      class="w-full px-3 py-2 rounded-xl border border-brand-border text-xs"
+                    >
+                      <option value="أعزب/عزباء">أعزب / عزباء</option>
+                      <option value="متزوج/متزوجة">متزوج / متزوجة</option>
+                      <option value="مطلق/مطلقة">مطلق / مطلقة</option>
+                      <option value="أرمل/أرملة">أرمل / أرملة</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-[11px] font-medium text-brand-muted mb-1"
+                      >الحالة المهنية</label
+                    >
+                    <select
+                      id="orderEmployment"
+                      class="w-full px-3 py-2 rounded-xl border border-brand-border text-xs"
+                    >
+                      <option value="موظف">موظف</option>
+                      <option value="طالب">طالب</option>
+                      <option value="باحث عن عمل">باحث عن عمل</option>
+                      <option value="أعمال حرة">أعمال حرة</option>
+                      <option value="ربة منزل">ربة منزل</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div
+                  class="pt-4 border-t border-brand-border flex items-center justify-end gap-2.5"
+                >
+                  <button
+                    type="button"
+                    onclick="App.navigate('userDashboard')"
+                    class="px-5 py-2.5 bg-white hover:bg-brand-bg border border-brand-border text-brand-text text-xs font-medium rounded-xl transition"
+                  >
+                    إلغاء
+                  </button>
+                  <button
+                    type="submit"
+                    id="btnSubmitOrder"
+                    class="px-7 py-2.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-medium text-xs rounded-xl shadow-sm transition flex items-center gap-2"
+                  >
+                    <span>إرسال الرؤيا</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- لوحة المستخدم (User Dashboard) -->
+          <section id="viewUserDashboard" class="view-section hidden space-y-6">
+            <div
+              class="bg-white border border-brand-border rounded-2xl p-6 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              <div class="space-y-1">
+                <h3
+                  class="text-lg font-bold text-brand-primary font-display"
+                  id="userWelcomeHeading"
+                >
+                  مرحباً بك
+                </h3>
+                <p class="text-xs text-brand-muted">
+                  شارك رؤيتك مع مفسر موثوق واستلم تفسيرها عبر المنصة.
+                </p>
+              </div>
+              <button
+                type="button"
+                onclick="App.navigate('newOrder')"
+                class="px-5 py-2.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-medium text-xs rounded-xl shadow-sm transition flex items-center gap-2 flex-shrink-0"
+              >
+                <i class="fa-solid fa-plus text-brand-accent text-[11px]"></i>
+                <span>إرسال رؤيا جديدة</span>
+              </button>
+            </div>
+
+            <div class="space-y-3">
+              <div class="flex items-center justify-between px-1">
+                <h4 class="text-sm font-bold text-brand-primary font-display">
+                  طلباتك الأخيرة
+                </h4>
+                <span class="text-[11px] text-brand-muted">تحديث تلقائي</span>
+              </div>
+              <div class="space-y-2.5" id="userOrdersList"></div>
+            </div>
+          </section>
+
+          <!-- لوحة المفسر المعتمد (Interpreter Dashboard) -->
+          <section
+            id="viewInterpreterDashboard"
+            class="view-section hidden space-y-6"
+          >
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            >
+              <div>
+                <h3 class="text-lg font-bold text-brand-primary font-display">
+                  لوحة المفسر
+                </h3>
+                <p class="text-xs text-brand-muted">
+                  دراسة وتأمل وتفسير الرؤى الموجهة إليك
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="bg-white rounded-2xl border border-brand-border overflow-hidden shadow-subtle"
+            >
+              <div
+                class="border-b border-brand-border px-5 py-3 flex gap-6 text-xs font-medium"
+              >
+                <button
+                  type="button"
+                  onclick="App.setIntTab('new')"
+                  id="tabIntNew"
+                  class="pb-2 text-brand-primary border-b-2 border-brand-primary font-bold"
+                >
+                  طلبات جديدة (<span id="intBadgeNew">0</span>)
+                </button>
+                <button
+                  type="button"
+                  onclick="App.setIntTab('in_progress')"
+                  id="tabIntProgress"
+                  class="pb-2 text-brand-muted hover:text-brand-primary"
+                >
+                  قيد التفسير (<span id="intBadgeProgress">0</span>)
+                </button>
+                <button
+                  type="button"
+                  onclick="App.setIntTab('completed')"
+                  id="tabIntCompleted"
+                  class="pb-2 text-brand-muted hover:text-brand-primary"
+                >
+                  المكتملة (<span id="intBadgeCompleted">0</span>)
+                </button>
+              </div>
+              <div id="interpreterOrdersList"></div>
+            </div>
+          </section>
+
+          <!-- لوحة المدير العام الموسعة والشاملة (Full Admin Suite) -->
+          <section
+            id="viewAdminDashboard"
+            class="view-section hidden space-y-6"
+          >
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            >
+              <div>
+                <h3
+                  class="text-lg font-bold text-brand-primary font-display"
+                  id="adminHeaderTitle"
+                >
+                  لوحة الإدارة الشاملة
+                </h3>
+                <p class="text-xs text-brand-muted" id="adminHeaderSubtitle">
+                  إدارة كاملة للنظام، المستخدمين، والمفسرين والتقارير
+                </p>
+              </div>
+              <div class="flex gap-2" id="adminActionButtons">
+                <!-- أزرار الإجراءات ديناميكية -->
+              </div>
+            </div>
+
+            <!-- مؤشرات الأداء الحية (تظهر في تبويب لوحة التحكم) -->
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
+              id="adminKpis"
+            ></div>
+
+            <!-- مساحة تبويبات الإدارة الموسعة -->
+            <div
+              class="bg-white rounded-2xl border border-brand-border overflow-hidden shadow-subtle p-5"
+              id="adminTabContent"
+            >
+              <!-- يتم تعبئته ديناميكياً من app.js -->
+            </div>
+          </section>
+
+          <!-- لوحة المتابع والممول (Observer Dashboard) -->
+          <section
+            id="viewObserverDashboard"
+            class="view-section hidden space-y-6"
+          >
+            <div
+              class="bg-white border border-brand-border rounded-2xl p-5 shadow-subtle flex items-center justify-between"
+            >
+              <div>
+                <h3 class="text-base font-bold text-brand-primary font-display">
+                  لوحة المتابعة والإشراف
+                </h3>
+                <p class="text-xs text-brand-muted">
+                  مراقبة مؤشرات الأداء والتدفق المالي (وضع القراءة فقط)
+                </p>
+              </div>
+              <span
+                class="px-3 py-1 bg-brand-bg text-brand-primary text-xs font-semibold rounded-full border border-brand-border"
+                >صلاحية: متابع وممول</span
+              >
+            </div>
+
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
+              id="obsKpis"
+            ></div>
+
+            <div
+              class="bg-white rounded-2xl border border-brand-border overflow-hidden shadow-subtle p-5"
+              id="obsTabContent"
+            >
+              <!-- ديناميكي -->
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal: تسجيل الدخول الموحد -->
+    <div
+      id="loginModal"
+      class="fixed inset-0 bg-brand-primary/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-sm w-full p-6 sm:p-8 shadow-card border border-brand-border space-y-6"
+      >
+        <div class="text-center space-y-1">
+          <div
+            class="w-9 h-9 rounded-lg bg-brand-primary text-brand-accent flex items-center justify-center text-base mx-auto mb-2 shadow-sm"
+          >
+            <i class="fa-solid fa-feather-pointed"></i>
+          </div>
+          <h3 class="text-lg font-bold text-brand-primary font-display">
+            مرحباً بك في رؤيا
+          </h3>
+          <p class="text-xs text-brand-muted">
+            سجل دخولك لمتابعة رؤاك أو إرسال رؤيا جديدة
+          </p>
+        </div>
+
+        <form onsubmit="App.handleLogin(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-bold text-brand-text mb-1"
+              >البريد الإلكتروني</label
+            >
+            <input
+              type="email"
+              id="loginEmail"
+              required
+              placeholder="name@example.com"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-brand-border text-xs focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full py-3 bg-brand-primary hover:bg-brand-primaryHover text-white font-medium rounded-xl text-xs shadow-sm transition"
+          >
+            دخول
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onclick="App.closeLoginModal()"
+          class="w-full text-center text-xs text-brand-muted hover:text-brand-text pt-1"
+        >
+          إغلاق النافذة
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal: تفاصيل الطلب بنظام Timeline -->
+    <div
+      id="orderDetailsModal"
+      class="fixed inset-0 bg-brand-primary/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-card my-8 border border-brand-border"
+        id="orderDetailsModalContent"
+      ></div>
+    </div>
+
+    <!-- Modal: شاشة تفسير الرؤيا للمفسر -->
+    <div
+      id="interpretActionModal"
+      class="fixed inset-0 bg-brand-primary/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-card my-8 border border-brand-border"
+        id="interpretActionModalContent"
+      ></div>
+    </div>
+
+    <!-- Modal: إضافة مفسر جديد (Admin) -->
+    <div
+      id="addInterpreterModal"
+      class="fixed inset-0 bg-brand-primary/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-card border border-brand-border space-y-4"
+      >
+        <div
+          class="flex justify-between items-center pb-2 border-b border-brand-border"
+        >
+          <h4 class="font-bold text-brand-primary text-sm font-display">
+            إضافة مفسر معتمد
+          </h4>
+          <button
+            type="button"
+            onclick="App.closeAddInterpreterModal()"
+            class="text-brand-muted hover:text-brand-text"
+          >
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+        <form
+          onsubmit="App.handleCreateInterpreter(event)"
+          class="space-y-3 text-xs"
+        >
+          <div>
+            <label class="block font-medium text-brand-text mb-1"
+              >الاسم الكامل</label
+            ><input
+              type="text"
+              id="newIntName"
+              required
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="الشيخ ..."
+            />
+          </div>
+          <div>
+            <label class="block font-medium text-brand-text mb-1"
+              >البريد الإلكتروني</label
+            ><input
+              type="email"
+              id="newIntEmail"
+              required
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="email@example.com"
+            />
+          </div>
+          <div>
+            <label class="block font-medium text-brand-text mb-1">التخصص</label
+            ><input
+              type="text"
+              id="newIntSpec"
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="الرموز العامة، الرؤى الأسرية..."
+            />
+          </div>
+          <div>
+            <label class="block font-medium text-brand-text mb-1">نبذة</label
+            ><textarea
+              id="newIntBio"
+              rows="2"
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+            ></textarea>
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              onclick="App.closeAddInterpreterModal()"
+              class="px-4 py-2 border border-brand-border text-brand-text rounded-xl font-medium"
+            >
+              إلغاء
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 bg-brand-primary text-white font-medium rounded-xl shadow-sm"
+            >
+              حفظ وإضافة
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: إضافة مستخدم جديد (Admin) -->
+    <div
+      id="addUserModal"
+      class="fixed inset-0 bg-brand-primary/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-card border border-brand-border space-y-4"
+      >
+        <div
+          class="flex justify-between items-center pb-2 border-b border-brand-border"
+        >
+          <h4 class="font-bold text-brand-primary text-sm font-display">
+            إضافة مستخدم جديد
+          </h4>
+          <button
+            type="button"
+            onclick="App.closeAddUserModal()"
+            class="text-brand-muted hover:text-brand-text"
+          >
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+        <form onsubmit="App.handleCreateUser(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-medium text-brand-text mb-1"
+              >اسم المستخدم</label
+            ><input
+              type="text"
+              id="newUsrName"
+              required
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="الاسم الكريم"
+            />
+          </div>
+          <div>
+            <label class="block font-medium text-brand-text mb-1"
+              >البريد الإلكتروني</label
+            ><input
+              type="email"
+              id="newUsrEmail"
+              required
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="email@example.com"
+            />
+          </div>
+          <div>
+            <label class="block font-medium text-brand-text mb-1"
+              >رقم الهاتف (اختياري)</label
+            ><input
+              type="text"
+              id="newUsrPhone"
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="05xxxxxxxx"
+            />
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              onclick="App.closeAddUserModal()"
+              class="px-4 py-2 border border-brand-border text-brand-text rounded-xl font-medium"
+            >
+              إلغاء
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 bg-brand-primary text-white font-medium rounded-xl shadow-sm"
+            >
+              إضافة المستخدم
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: إرسال شكوى أو مقترح (User) -->
+    <div
+      id="addComplaintModal"
+      class="fixed inset-0 bg-brand-primary/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-card border border-brand-border space-y-4"
+      >
+        <div
+          class="flex justify-between items-center pb-2 border-b border-brand-border"
+        >
+          <h4 class="font-bold text-brand-primary text-sm font-display">
+            إرسال شكوى أو مقترح
+          </h4>
+          <button
+            type="button"
+            onclick="App.closeAddComplaintModal()"
+            class="text-brand-muted hover:text-brand-text"
+          >
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+        <form
+          onsubmit="App.handleCreateComplaint(event)"
+          class="space-y-3 text-xs"
+        >
+          <div>
+            <label class="block font-medium text-brand-text mb-1"
+              >نوع الرسالة</label
+            >
+            <select
+              id="complaintType"
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+            >
+              <option value="مقترح">مقترح تطويري</option>
+              <option value="استفسار">استفسار عام</option>
+              <option value="شكوى">شكوى بخصوص طلب</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-brand-text mb-1">الموضوع</label
+            ><input
+              type="text"
+              id="complaintSubject"
+              required
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="موضوع الرسالة..."
+            />
+          </div>
+          <div>
+            <label class="block font-medium text-brand-text mb-1"
+              >تفاصيل الرسالة</label
+            ><textarea
+              id="complaintText"
+              required
+              rows="3"
+              class="w-full px-3 py-2 border border-brand-border rounded-xl"
+              placeholder="اكتب ملاحظتك بالتفصيل..."
+            ></textarea>
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              onclick="App.closeAddComplaintModal()"
+              class="px-4 py-2 border border-brand-border text-brand-text rounded-xl font-medium"
+            >
+              إلغاء
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 bg-brand-primary text-white font-medium rounded-xl shadow-sm"
+            >
+              إرسال الرسالة
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- إشعار Toast -->
+    <div
+      id="toast"
+      class="fixed bottom-5 left-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-brand-primary text-white px-4 py-3 rounded-xl shadow-card flex items-center gap-2.5 text-xs font-medium border border-brand-primaryHover"
+    >
+      <i
+        class="fa-solid fa-circle-check text-brand-accent text-sm"
+        id="toastIcon"
+      ></i>
+      <span id="toastMessage">رسالة التنبيه</span>
+    </div>
+
+    <!-- Footer -->
+    <footer
+      id="publicFooter"
+      class="bg-white border-t border-brand-border py-8 text-center text-xs text-brand-muted mt-16"
+    >
+      <div
+        class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-4"
+      >
+        <div
+          class="flex items-center gap-2 font-bold text-brand-primary font-display text-sm"
+        >
+          <span class="w-2 h-2 rounded-full bg-brand-accent"></span> رؤيا | منصة
+          تفسير الرؤى
+        </div>
+        <div class="flex gap-6 text-[11px]">
+          <a href="#how-it-works" class="hover:text-brand-primary transition"
+            >كيف تعمل؟</a
+          >
+          <a href="#why-ruya" class="hover:text-brand-primary transition"
+            >عن المنصة</a
+          >
+          <a href="#pricing" class="hover:text-brand-primary transition"
+            >الأسعار</a
+          >
+        </div>
+        <p class="text-[11px]">© 2026 جميع الحقوق محفوظة.</p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
